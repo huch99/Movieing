@@ -64,7 +64,7 @@ React 기반의 클라이언트는 REST API를 통해 Spring Boot 서버와 통�
 ---
 
 ## 🔁 예매 · 결제 트랜잭션 흐름
-![Transaction Flow](movieing_transaction_flow.svg)
+![Transaction Flow](docs/movieing_transaction_flow.svg)
 
 예매와 결제는 하나의 트랜잭션 흐름으로 관리됩니다.
 
