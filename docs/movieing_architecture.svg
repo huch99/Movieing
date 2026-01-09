@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="520" viewBox="0 0 1400 520">
+  <defs>
+    <style>
+      .title{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:44px;font-weight:700;fill:#2f3b48;}
+      .label{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;fill:#2f3b48;}
+      .sublabel{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:18px;font-weight:500;fill:#546171;}
+      .card{fill:#ffffff;stroke:#cfd7e3;stroke-width:3;rx:22;ry:22;}
+      .pill{fill:#f3f6fb;stroke:#d9e2ef;stroke-width:2;rx:16;ry:16;}
+      .arrow{stroke:#6b7787;stroke-width:6;fill:none;marker-end:url(#m);}
+      .tag{fill:#f7f2e8;stroke:#e9d3a7;stroke-width:2;rx:12;ry:12;}
+      .tagText{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;fill:#8a5b00;}
+      .small{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;fill:#6b7787;}
+    </style>
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7787"/>
+    </marker>
+    <!-- Simple React atom -->
+    <g id="reactIcon">
+      <circle cx="0" cy="0" r="8" fill="#4dd0e1"/>
+      <ellipse cx="0" cy="0" rx="34" ry="12" fill="none" stroke="#4dd0e1" stroke-width="3"/>
+      <ellipse cx="0" cy="0" rx="34" ry="12" fill="none" stroke="#4dd0e1" stroke-width="3" transform="rotate(60)"/>
+      <ellipse cx="0" cy="0" rx="34" ry="12" fill="none" stroke="#4dd0e1" stroke-width="3" transform="rotate(-60)"/>
+    </g>
+    <!-- Simple database cylinder -->
+    <g id="dbIcon">
+      <ellipse cx="0" cy="-26" rx="60" ry="18" fill="#8ec5ff" stroke="#5ea2e6" stroke-width="3"/>
+      <path d="M -60 -26 L -60 48 C -60 68 60 68 60 48 L 60 -26" fill="#73b7ff" stroke="#5ea2e6" stroke-width="3"/>
+      <ellipse cx="0" cy="48" rx="60" ry="18" fill="#5ea2e6"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="520" fill="#ffffff"/>
+  <text x="700" y="80" text-anchor="middle" class="title">System Architecture</text>
+
+  <!-- Card 1: Client -->
+  <rect x="70" y="150" width="260" height="260" class="card"/>
+  <text x="200" y="200" text-anchor="middle" class="label">Client</text>
+  <use href="#reactIcon" x="200" y="265"/>
+  <rect x="110" y="320" width="180" height="54" class="pill"/>
+  <text x="200" y="354" text-anchor="middle" class="sublabel">React • TypeScript</text>
+  <text x="200" y="406" text-anchor="middle" class="small">Web / Mobile</text>
+
+  <!-- Card 2: API Server -->
+  <rect x="430" y="150" width="300" height="260" class="card"/>
+  <text x="580" y="200" text-anchor="middle" class="label">API Server</text>
+  <rect x="480" y="238" width="200" height="110" rx="18" ry="18" fill="#1e4d7b"/>
+  <text x="580" y="285" text-anchor="middle" font-family="Inter,system-ui" font-size="24" font-weight="800" fill="#ffffff">Spring Boot</text>
+  <text x="580" y="318" text-anchor="middle" font-family="Inter,system-ui" font-size="18" font-weight="700" fill="#d9ecff">REST API</text>
+  <rect x="495" y="360" width="170" height="46" class="pill"/>
+  <text x="580" y="389" text-anchor="middle" class="sublabel">Java 21</text>
+
+  <!-- Card 3: ORM -->
+  <rect x="820" y="220" width="220" height="120" class="tag"/>
+  <text x="930" y="258" text-anchor="middle" class="tagText">ORM</text>
+  <text x="930" y="294" text-anchor="middle" class="sublabel" fill="#8a5b00">JPA • Hibernate</text>
+
+  <!-- Card 4: Database -->
+  <rect x="1110" y="150" width="260" height="260" class="card"/>
+  <text x="1240" y="200" text-anchor="middle" class="label">Database</text>
+  <use href="#dbIcon" x="1240" y="285"/>
+  <text x="1240" y="380" text-anchor="middle" font-family="Inter,system-ui" font-size="26" font-weight="800" fill="#2f3b48">MariaDB</text>
+
+  <!-- Arrows -->
+  <path d="M 330 280 L 430 280" class="arrow"/>
+  <rect x="350" y="240" width="110" height="34" rx="12" ry="12" fill="#eef2f7" stroke="#d9e2ef" stroke-width="2"/>
+  <text x="405" y="263" text-anchor="middle" class="small">HTTP (REST)</text>
+
+  <path d="M 730 280 L 820 280" class="arrow"/>
+  <rect x="745" y="240" width="84" height="34" rx="12" ry="12" fill="#eef2f7" stroke="#d9e2ef" stroke-width="2"/>
+  <text x="787" y="263" text-anchor="middle" class="small">ORM</text>
+
+  <path d="M 1040 280 L 1110 280" class="arrow"/>
+
+</svg>
