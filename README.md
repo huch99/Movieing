@@ -18,7 +18,7 @@ movieing/
  ├ frontend/       # React + TypeScript
  ├ docs/           # ERD, Architecture, Diagrams
  └ README.md
-
+```
 
 ---
 
