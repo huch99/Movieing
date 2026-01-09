@@ -1,0 +1,19 @@
+/* src/components/layout/MainLayout/MainFooter/MainFooter.css */
+.main-footer {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #eee;
+  background: #fff;
+  color: #777;
+  font-size: 12px;
+}
+
+.main-footer__inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+}

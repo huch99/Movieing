@@ -1,0 +1,13 @@
+/* src/components/layout/MainLayout/MainSection/MainSection.css */
+.main-section {
+  flex: 1;
+  display: flex;
+  background: #fafafa;
+}
+
+.main-section__inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
