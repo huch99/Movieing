@@ -1,0 +1,25 @@
+/* src/pages/UserHome/UserHome.css */
+.user-home {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.user-home__grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 18px;
+}
+
+.user-home__left,
+.user-home__right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@media (max-width: 960px) {
+  .user-home__grid {
+    grid-template-columns: 1fr;
+  }
+}
