@@ -1,0 +1,143 @@
+/* ===== Admin Page Wrapper ===== */
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== Head ===== */
+.admin-main__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.admin-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ===== Stats ===== */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.stat__value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ===== Quick Actions ===== */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admin-card__desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* ===== Buttons ===== */
+.admin-btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-btn--primary {
+  background: var(--movieing-gradient);
+  border: none;
+  color: #fff;
+}
+
+/* ===== Panel ===== */
+.admin-panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-panel__title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.admin-panel__empty {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+  .admin-stats,
+  .admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-stats,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
