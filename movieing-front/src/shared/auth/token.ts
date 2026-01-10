@@ -1,5 +1,5 @@
 // src/shared/auth/token.ts
-type JwtPayload = { role?: string; exp?: number; [k: string]: unknown };
+type JwtPayload = { role?: string; exp?: number;[k: string]: unknown };
 
 export function parseJwtPayload(token: string): JwtPayload | null {
   try {
