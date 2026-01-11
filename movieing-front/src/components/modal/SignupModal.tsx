@@ -1,20 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../../shared/api/api";
 import './SignupModal.css';
-
-type UserRole = "USER" | "ADMIN" | "THEATER";
+import type { ApiResponse, UserRole } from "../../shared/auth/types";
 
 type SignupResponseDto = {
     publicUserId: string;
     userName: string;
     email: string;
     role: UserRole;
-};
-
-type ApiResponse<T> = {
-    resultCode: "SUCCESS" | "ERROR";
-    resultMessage: string;
-    data: T | null;
 };
 
 type SignupModalProps = {

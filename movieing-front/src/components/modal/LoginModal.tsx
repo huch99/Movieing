@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import api, { ACCESS_TOKEN_KEY } from '../../shared/api/api';
 import './LoginModal.css';
-
-type UserRole = "USER" | "ADMIN" | "THEATER";
+import type { ApiResponse, UserRole } from '../../shared/auth/types';
 
 type LoginResponseDto = {
     accessToken: string;
@@ -11,12 +10,6 @@ type LoginResponseDto = {
     userName: string;
     email: string;
     role: UserRole;
-};
-
-type ApiResponse<T> = {
-    resultCode: "SUCCESS" | "ERROR";
-    resultMessage: string;
-    data: T | null;
 };
 
 type LoginModalProps = {
