@@ -5,24 +5,21 @@ import "./Layout.css";
 import SideBar from "./SideBar";
 import { ACCESS_TOKEN_KEY } from "../../shared/api/api";
 import LoginModal from "../modal/LoginModal";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import SignupModal from "../modal/SignupModal";
+import type { User } from "../../shared/auth/types";
 
-type UserRole = "USER" | "ADMIN" | "THEATER";
-
-type User = {
-    publicUserId: string;
-    userName: string;
-    email: string;
-    role: UserRole;
+type LayoutProps = {
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
+export default function Layout({ user, setUser }: LayoutProps) {
 
-export default function Layout() {
+    const navigate = useNavigate();
 
     const [loginOpen, setLoginOpen] = useState(false);
     const [registerOpen, setRegisterOpen] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -43,6 +40,7 @@ export default function Layout() {
     return (
         <div className="layout">
             <Header
+                variant="app"
                 isLoggedIn={!!user}
                 userName={user?.userName}
                 onClickLogin={() => {
@@ -86,9 +84,9 @@ export default function Layout() {
                     });
                     setLoginOpen(false);
 
-                    // ADMIN이면 /admin 이동
-                    if (u.role === "ADMIN") {
-                        window.location.href = "/admin";
+                    // ADMIN / THEATER면 /admin 이동
+                    if (u.role === "ADMIN" || u.role === "THEATER") {
+                        navigate("/admin", { replace: true });
                     }
                 }}
             />
