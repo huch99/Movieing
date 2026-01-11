@@ -13,10 +13,6 @@ export default function SideBar({ isLoggedIn = false, userName, onLogout }: Side
       <div className="sidebar__inner">
         {/* Profile / Brand */}
         <div className="sidebar__top">
-          {/* <div className="sidebar__brand">
-            <img src="/MovieingLogo.png" alt="Movieing" className="sidebar__logo" />
-          </div> */}
-
           <div className="sidebar__profile">
             <div className="sidebar__hello">
               {isLoggedIn ? (
