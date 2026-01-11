@@ -1,35 +1,6 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import './Home.css';
-import { ACCESS_TOKEN_KEY } from "../../shared/api/api";
-
-type TokenPayload = {
-  role?: string;
-}
-
-function getTokenPayload(): TokenPayload | null {
-  try {
-    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (!token) return null;
-
-    const payloadBase64 = token.split(".")[1];
-    const decoded = atob(payloadBase64);
-    return JSON.parse(decoded);
-  } catch {
-    return null;
-  }
-}
 
 export default function Home() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // ✅ ADMIN만 /admin으로 이동
-    const payload = getTokenPayload();
-    if (payload?.role === "ADMIN") {
-      navigate("/admin", { replace: true });
-    }
-  }, [navigate]);
 
   return (
     <div>
