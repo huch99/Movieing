@@ -146,3 +146,33 @@
     order: 2;
   }
 }
+
+/* ===== Admin Variant ===== */
+.app-header--admin .app-header__search {
+  display: none; /* admin에서는 검색 숨김 */
+}
+
+.app-header__badge {
+  border: 1px solid var(--line);
+  background: rgba(229, 9, 20, 0.16);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.app-header__link {
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  font-size: 13px;
+}
+
+.app-header__link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
