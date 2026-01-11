@@ -1,18 +1,14 @@
 package com.movieing.movieingbackend.auth.controller;
 
 import com.movieing.movieingbackend.aspect.ApiResponse;
-import com.movieing.movieingbackend.auth.dto.LoginRequestDto;
-import com.movieing.movieingbackend.auth.dto.LoginResponseDto;
-import com.movieing.movieingbackend.auth.dto.SignupRequestDto;
-import com.movieing.movieingbackend.auth.dto.SignupResponseDto;
+import com.movieing.movieingbackend.auth.dto.*;
+import com.movieing.movieingbackend.auth.service.AuthMeService;
 import com.movieing.movieingbackend.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthMeService authMeService;
 
     // 로그인
     @PostMapping("/login")
@@ -39,5 +36,13 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // 로그인 유저 정보 가져오기
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MeResponseDto>> me(Authentication authentication) {
+        String subject = authentication.getName();
+        MeResponseDto dto = authMeService.getMe(subject);
+        return ResponseEntity.ok(ApiResponse.success((authMeService.getMe(subject))));
     }
 }

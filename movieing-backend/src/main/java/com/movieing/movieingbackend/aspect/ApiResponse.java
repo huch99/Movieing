@@ -10,20 +10,20 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiResponse<T> {
 
-    private String resultCode;
+    private ResultCode resultCode;
     private String resultMessage;
     private T data;
 
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
-                .resultCode("SUCCESS")
+                .resultCode(ResultCode.SUCCESS)
                 .resultMessage("SUCCESS")
                 .data(data)
                 .build();
     }
     public static <T> ApiResponse<T> error(String resultMessage) {
         return ApiResponse.<T>builder()
-                .resultCode("ERROR")
+                .resultCode(ResultCode.ERROR)
                 .resultMessage(resultMessage)
                 .data(null)
                 .build();
