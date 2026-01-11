@@ -6,7 +6,7 @@ import SideBar from "./SideBar";
 import { ACCESS_TOKEN_KEY } from "../../shared/api/api";
 import LoginModal from "../modal/LoginModal";
 import { Outlet } from "react-router-dom";
-import RegisterModal from "../modal/RegisterModal";
+import SignupModal from "../modal/SignupModal";
 
 type UserRole = "USER" | "ADMIN" | "THEATER";
 
@@ -94,10 +94,10 @@ export default function Layout() {
             />
 
             {/* ✅ 회원가입 모달 추가 */}
-            <RegisterModal
+            <SignupModal
                 open={registerOpen}
                 onClose={() => setRegisterOpen(false)}
-                onSuccess={(u) => {
+                onSuccess={() => {
                     setRegisterOpen(false);
                     setLoginOpen(true);
                 }}
