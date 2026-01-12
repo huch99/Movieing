@@ -7,6 +7,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import { useEffect, useState } from "react";
 import api, { ACCESS_TOKEN_KEY } from "./shared/api/api";
 import type { ApiResponse, User, UserRole } from "./shared/auth/types";
+import AdminMovieListPage from "./pages/Admin/MoviePage/AdminMovieListPage";
+import AdminMovieDetailPage from "./pages/Admin/MoviePage/AdminMovieDetailPage";
 
 type TokenPayload = {
   role?: UserRole;
@@ -81,8 +83,8 @@ function App() {
         {/* ✅ 어드민 영역 */}
         <Route path="/admin" element={<AdminLayout user={user} setUser={setUser} />}>
           <Route index element={<AdminDashboard />} />
-          {/* <Route path="movies" element={<AdminMovies />} /> */}
-          {/* /admin/theaters, /admin/schedules ... */}
+          <Route path="/admin/movies" element={<AdminMovieListPage />} />
+          <Route path="/admin/movies/:movieId" element={<AdminMovieDetailPage />} />
         </Route>
 
         {/* 404 */}
