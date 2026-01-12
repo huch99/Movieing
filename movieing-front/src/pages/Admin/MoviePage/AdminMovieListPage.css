@@ -1,0 +1,232 @@
+/* AdminMovieListPage.css */
+
+.admin-movie-list {
+  padding: 24px;
+}
+
+.admin-movie-list__card {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.admin-movie-list__top {
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #eef0f3;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+}
+
+.admin-movie-list__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-movie-list__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #111827;
+}
+
+.admin-movie-list__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.admin-movie-list__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-movie-list__create-btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: #111827;
+  cursor: pointer;
+  transition: transform 0.06s ease, opacity 0.2s ease;
+}
+
+.admin-movie-list__create-btn:hover {
+  opacity: 0.92;
+}
+
+.admin-movie-list__create-btn:active {
+  transform: translateY(1px);
+}
+
+.admin-movie-list__table-wrap {
+  overflow: auto;
+}
+
+.admin-movie-list__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-movie-list__thead th {
+  position: sticky;
+  top: 0;
+  background: #fafafa;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.admin-movie-list__tbody td {
+  padding: 14px 14px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #111827;
+  vertical-align: middle;
+}
+
+.admin-movie-list__row {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.admin-movie-list__row:hover {
+  background: #f9fafb;
+}
+
+.admin-movie-list__id {
+  width: 90px;
+  color: #374151;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-movie-list__title-cell {
+  font-weight: 650;
+}
+
+.admin-movie-list__muted {
+  color: #9ca3af;
+}
+
+.admin-movie-list__date {
+  font-variant-numeric: tabular-nums;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.admin-movie-list__status {
+  width: 160px;
+}
+
+.admin-movie-list__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.admin-movie-list__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+/* status variants */
+.admin-movie-list__badge--DRAFT {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+.admin-movie-list__badge--DRAFT .admin-movie-list__dot {
+  background: #6b7280;
+}
+
+.admin-movie-list__badge--COMING_SOON {
+  background: #eef2ff;
+  border-color: #e0e7ff;
+  color: #3730a3;
+}
+.admin-movie-list__badge--COMING_SOON .admin-movie-list__dot {
+  background: #4f46e5;
+}
+
+.admin-movie-list__badge--NOW_SHOWING {
+  background: #ecfdf5;
+  border-color: #d1fae5;
+  color: #065f46;
+}
+.admin-movie-list__badge--NOW_SHOWING .admin-movie-list__dot {
+  background: #10b981;
+}
+
+.admin-movie-list__badge--HIDDEN {
+  background: #fff7ed;
+  border-color: #ffedd5;
+  color: #9a3412;
+}
+.admin-movie-list__badge--HIDDEN .admin-movie-list__dot {
+  background: #f97316;
+}
+
+.admin-movie-list__badge--ENDED {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+.admin-movie-list__badge--ENDED .admin-movie-list__dot {
+  background: #64748b;
+}
+
+.admin-movie-list__badge--DELETED {
+  background: #fef2f2;
+  border-color: #fee2e2;
+  color: #991b1b;
+}
+.admin-movie-list__badge--DELETED .admin-movie-list__dot {
+  background: #ef4444;
+}
+
+.admin-movie-list__empty {
+  padding: 26px 20px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.admin-movie-list__loading,
+.admin-movie-list__error {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #eef0f3;
+  background: #fff;
+}
+
+.admin-movie-list__error {
+  border-color: #fee2e2;
+  background: #fef2f2;
+  color: #991b1b;
+}
