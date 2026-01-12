@@ -1,6 +1,5 @@
 package com.movieing.movieingbackend.user.entity;
 
-import com.movieing.movieingbackend.aspect.BaseTimeEntity;
 import com.movieing.movieingbackend.theater.entity.Theater;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserAdmin extends BaseTimeEntity {
+public class UserAdmin {
 
     @Id
     @Column(name="user_id")
