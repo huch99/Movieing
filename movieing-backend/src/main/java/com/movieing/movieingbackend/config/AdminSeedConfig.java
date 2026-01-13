@@ -1,28 +1,51 @@
 package com.movieing.movieingbackend.config;
 
 import com.movieing.movieingbackend.user.entity.User;
+import com.movieing.movieingbackend.user.entity.UserAdmin;
 import com.movieing.movieingbackend.user.entity.UserRole;
+import com.movieing.movieingbackend.user.repository.UserAdminRepository;
 import com.movieing.movieingbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.UUID;
 
+/**
+ * 관리자 계정 초기 시드 데이터 설정
+ * <p>
+ * - 애플리케이션 최초 기동 시 관리자 계정이 존재하지 않으면 자동 생성
+ * - 개발/테스트 환경에서 관리자 계정을 빠르게 확보하기 위한 용도
+ * <p>
+ * 동작 방식:
+ * - 지정된 관리자 이메일(admin@movieing.com)이 존재하는지 확인
+ * - 존재하지 않을 경우 관리자(UserRole.ADMIN) 계정을 생성
+ * <p>
+ * 주의:
+ * - 운영 환경에서는 사용 여부를 반드시 검토하거나 비활성화 필요
+ */
+@Profile("local")
 @Configuration
 @RequiredArgsConstructor
 public class AdminSeedConfig {
 
+    /**
+     * 관리자 계정 시드 데이터 생성
+     * <p>
+     * - CommandLineRunner를 사용하여 애플리케이션 시작 시 1회 실행
+     * - 이미 관리자 계정이 존재하면 아무 작업도 수행하지 않음
+     */
     @Bean
-    CommandLineRunner seedAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner seedAdmin(UserRepository userRepository, UserAdminRepository userAdminRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             String adminEmail = "admin@movieing.com";
-            if(userRepository.existsByEmail(adminEmail)) return ;
+            if (userRepository.existsByEmail(adminEmail)) return;
 
+            // 1. User 생성 (publicUserId, agreeAt은 @PrePersist에서 자동 처리)
             User admin = User.builder()
-                    .publicUserId(UUID.randomUUID().toString())
                     .userName("ADMIN")
                     .email(adminEmail)
                     .passwordHash(passwordEncoder.encode("admin1234!"))
@@ -31,7 +54,15 @@ public class AdminSeedConfig {
                     .isActive(true)
                     .build();
 
-            userRepository.save(admin);
+            User savedAdmin = userRepository.save(admin);
+
+            // 2. UserAdmin 생성 (PK 공유, @MapsId 구조)
+            UserAdmin userAdmin = UserAdmin.builder()
+                    .user(savedAdmin)
+                    .theater(null)   // 아직 소속 영화관 없음
+                    .build();
+
+            userAdminRepository.save(userAdmin);
         };
     }
 }
