@@ -1,10 +1,7 @@
 package com.movieing.movieingbackend.theater.controller.admin;
 
 import com.movieing.movieingbackend.aspect.ApiResponse;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterCompleteAdminRequestDto;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterDetailAdminResponseDto;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterDraftSaveAdminRequestDto;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterListItemAdminResponseDto;
+import com.movieing.movieingbackend.theater.dto.admin.*;
 import com.movieing.movieingbackend.theater.service.admin.AdminTheaterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -119,6 +116,31 @@ public class AdminTheaterController {
     @DeleteMapping("/{theaterId}")
     public ApiResponse<Void> remove(@PathVariable Long theaterId) {
         adminTheaterService.remove(theaterId);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 영화관 정보 수정 (관리자)
+     *
+     * - 운영 중(ACTIVE), 숨김(HIDDEN), 운영 종료(CLOSED) 상태의 영화관 정보를 수정
+     * - 초안(DRAFT) 상태의 영화관은 수정 불가 (draft 저장 API 사용)
+     * - 삭제(DELETED) 상태의 영화관은 수정 불가
+     *
+     * 수정 방식:
+     * - 부분 수정(Partial Update)
+     * - 요청 DTO에서 null로 전달된 필드는 "변경하지 않음"으로 처리
+     *
+     * 검증 책임:
+     * - 필수 입력 여부: 없음 (모든 필드 선택 입력)
+     * - 상태별 수정 가능 여부: 서비스 레이어
+     * - 정책성 검증(위경도 쌍, 영업 시간 관계 등): 서비스 레이어
+     */
+    @PutMapping("/{theaterId}")
+    public ApiResponse<Void> update(
+            @PathVariable Long theaterId,
+            @RequestBody TheaterUpdateAdminRequestDto req
+    ) {
+        adminTheaterService.update(theaterId, req);
         return ApiResponse.success(null);
     }
 }

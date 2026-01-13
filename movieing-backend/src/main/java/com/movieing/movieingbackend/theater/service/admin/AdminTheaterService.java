@@ -2,10 +2,7 @@ package com.movieing.movieingbackend.theater.service.admin;
 
 import com.movieing.movieingbackend.common.exception.ConflictException;
 import com.movieing.movieingbackend.common.exception.NotFoundException;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterCompleteAdminRequestDto;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterDetailAdminResponseDto;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterDraftSaveAdminRequestDto;
-import com.movieing.movieingbackend.theater.dto.admin.TheaterListItemAdminResponseDto;
+import com.movieing.movieingbackend.theater.dto.admin.*;
 import com.movieing.movieingbackend.theater.entity.Theater;
 import com.movieing.movieingbackend.theater.entity.TheaterStatus;
 import com.movieing.movieingbackend.theater.repository.TheaterRepository;
@@ -178,5 +175,68 @@ public class AdminTheaterService {
     private Theater getEntity(Long theaterId) {
         return theaterRepository.findById(theaterId)
                 .orElseThrow(() -> new NotFoundException("영화관을 찾을 수 없습니다. id=" + theaterId));
+    }
+
+    /**
+     * 영화관 정보 수정 (관리자)
+     *
+     * 허용 상태:
+     * - ACTIVE / HIDDEN / CLOSED: 수정 허용
+     *
+     * 금지 상태:
+     * - DRAFT: draft 저장 API를 통해서만 수정 가능
+     * - DELETED: 수정 불가
+     *
+     * 수정 방식:
+     * - 부분 수정(Partial Update)
+     * - 요청 DTO에서 null로 전달된 필드는 "변경하지 않음"으로 처리
+     *
+     * 검증 책임:
+     * - 필수값 검증: 없음(모두 optional)
+     * - 상태 검증: ensureUpdatableStatus()
+     * - 정책성 검증(위경도 쌍, 시간 범위 등): 필요 시 서비스에서 추가
+     */
+    @Transactional
+    public void update(Long theaterId, TheaterUpdateAdminRequestDto req) {
+        Theater theater = getEntity(theaterId); // DELETED 방어
+        ensureUpdatableStatus(theater);
+
+        // 부분 변경 (null이면 변경 안 함)
+        if (req.getTheaterName() != null) {
+            theater.changeTheaterName(req.getTheaterName());
+        }
+        if (req.getAddress() != null) {
+            theater.changeAddress(req.getAddress());
+        }
+        if (req.getLat() != null) {
+            theater.changeLat(req.getLat());
+        }
+        if (req.getLng() != null) {
+            theater.changeLng(req.getLng());
+        }
+        if (req.getOpenTime() != null) {
+            theater.changeOpenTime(req.getOpenTime());
+        }
+        if (req.getCloseTime() != null) {
+            theater.changeCloseTime(req.getCloseTime());
+        }
+    }
+
+    /**
+     * 영화관 수정 가능 상태 검증
+     *
+     * 정책:
+     * - ACTIVE / HIDDEN / CLOSED: 수정 허용
+     * - DRAFT: 수정 불가 (draft 저장 API로만 수정 허용)
+     * - DELETED: 수정 불가
+     */
+    private void ensureUpdatableStatus(Theater theater) {
+        if (theater.getStatus() == TheaterStatus.DELETED) {
+            throw new ConflictException("삭제된 영화관은 수정할 수 없습니다.");
+        }
+        if (theater.getStatus() == TheaterStatus.DRAFT) {
+            throw new ConflictException("초안 상태의 영화관은 draft 저장을 통해 수정하세요.");
+        }
+        // ACTIVE / HIDDEN / CLOSED 는 허용
     }
 }

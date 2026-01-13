@@ -42,13 +42,13 @@ public class Screen extends BaseTimeEntity {
     private Long screenId; // 상영관 ID (내부 PK)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "theater_id", nullable = false)
+    @JoinColumn(name = "theater_id", nullable = true)
     private Theater theater; // 소속 영화관
 
-    @Column(name = "screen_name", nullable = false, length = 255)
+    @Column(name = "screen_name", nullable = true, length = 255)
     private String screenName; // 상영관 이름 (예: 1관, IMAX관 등)
 
-    @Column(name = "capacity", nullable = false)
+    @Column(name = "capacity", nullable = true)
     @Builder.Default
     private Integer capacity = 0; // 수용 인원 (기본 0, 운영 정책에 따라 0 허용/불허 결정)
 
