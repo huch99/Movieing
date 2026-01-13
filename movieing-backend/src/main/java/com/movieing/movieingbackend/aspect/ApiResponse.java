@@ -7,7 +7,7 @@ import lombok.Getter;
 
 /**
  * 공통 API 응답 래퍼
- *
+ * <p>
  * - 모든 컨트롤러의 응답은 ApiResponse 형태로 반환
  * - HTTP Status 코드는 GlobalExceptionHandler 에서 관리
  * - 컨트롤러는 정상 처리 흐름만 담당
@@ -39,12 +39,12 @@ public class ApiResponse<T> {
 
     /**
      * 실패 응답 생성
-     *
+     * <p>
      * - HTTP Status 는 GlobalExceptionHandler 에서 결정
      * - 이 메서드는 응답 바디 형태만 통일하는 역할
      *
      * @param resultMessage 에러 메시지
-     * @param <T>            데이터 타입
+     * @param <T>           데이터 타입
      * @return 실패 ApiResponse
      */
     public static <T> ApiResponse<T> error(String resultMessage) {
