@@ -1,0 +1,397 @@
+/* AdminMovieListPage.css */
+
+/* ===== Theme tokens ===== */
+:root {
+  --bg: #0b0f1a;
+  --bg2: #0f172a;
+  --card: rgba(17, 24, 39, 0.72);
+  --card2: rgba(2, 6, 23, 0.35);
+  --border: rgba(148, 163, 184, 0.14);
+  --border2: rgba(148, 163, 184, 0.18);
+  --text: #e5e7eb;
+  --muted: rgba(229, 231, 235, 0.62);
+  --muted2: rgba(229, 231, 235, 0.42);
+
+  --accent: #7c3aed; /* violet */
+  --accent2: #a78bfa;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #22c55e;
+  --info: #38bdf8;
+
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --radius: 18px;
+}
+
+/* ===== Page layout ===== */
+.admin-movie-list {
+  min-height: calc(100vh - 120px);
+  padding: 28px 18px 36px;
+  background:
+    radial-gradient(900px 450px at 15% 10%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(700px 420px at 85% 15%, rgba(56, 189, 248, 0.12), transparent 55%),
+    radial-gradient(900px 520px at 50% 110%, rgba(16, 185, 129, 0.08), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  color: var(--text);
+}
+
+.admin-movie-list__card {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 20px 20px 14px;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== Header area ===== */
+.admin-movie-list__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 6px 14px;
+}
+
+.admin-movie-list__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-movie-list__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.admin-movie-list__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.admin-movie-list__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== Primary button ===== */
+.admin-movie-list__create-btn {
+  appearance: none;
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  background:
+    linear-gradient(180deg, rgba(124, 58, 237, 0.95), rgba(124, 58, 237, 0.72));
+  color: white;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, border-color 140ms ease;
+  box-shadow: 0 10px 22px rgba(124, 58, 237, 0.26);
+  white-space: nowrap;
+}
+
+.admin-movie-list__create-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  border-color: rgba(167, 139, 250, 0.42);
+  box-shadow: 0 14px 28px rgba(124, 58, 237, 0.33);
+}
+
+.admin-movie-list__create-btn:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+.admin-movie-list__create-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.35),
+    0 14px 28px rgba(124, 58, 237, 0.33);
+}
+
+/* ===== Table wrap ===== */
+.admin-movie-list__table-wrap {
+  margin-top: 8px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.40), rgba(2, 6, 23, 0.20));
+  overflow: hidden;
+}
+
+/* ===== Table ===== */
+.admin-movie-list__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-movie-list__thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(229, 231, 235, 0.78);
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.52);
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-movie-list__tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(229, 231, 235, 0.88);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  background: rgba(2, 6, 23, 0.10);
+}
+
+/* zebra + hover */
+.admin-movie-list__tbody tr:nth-child(even) td {
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.admin-movie-list__row {
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.admin-movie-list__row:hover td {
+  background: rgba(124, 58, 237, 0.10);
+}
+
+.admin-movie-list__row:active td {
+  background: rgba(124, 58, 237, 0.14);
+}
+
+.admin-movie-list__id {
+  width: 80px;
+  color: rgba(229, 231, 235, 0.70);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-movie-list__title-cell {
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.admin-movie-list__date {
+  width: 140px;
+  color: rgba(229, 231, 235, 0.70);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-movie-list__status {
+  width: 160px;
+}
+
+.admin-movie-list__muted {
+  color: var(--muted2);
+  font-weight: 600;
+}
+
+/* Empty row */
+.admin-movie-list__empty {
+  text-align: center;
+  padding: 22px 14px !important;
+  color: rgba(229, 231, 235, 0.60);
+}
+
+/* ===== Badge ===== */
+.admin-movie-list__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: rgba(15, 23, 42, 0.45);
+  color: rgba(229, 231, 235, 0.84);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+.admin-movie-list__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.9);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14);
+}
+
+/* ===== Status color mapping =====
+  네가 쓰는 status 값에 맞춰 자동으로 먹도록 "포괄적으로" 잡아둠.
+  (예: DRAFT, TEMP, SAVED, READY, UPCOMING, PUBLISHED, OPEN, CLOSED, DISABLED 등)
+*/
+.admin-movie-list__badge--DRAFT,
+.admin-movie-list__badge--TEMP,
+.admin-movie-list__badge--TEMPORARY,
+.admin-movie-list__badge--SAVED {
+  border-color: rgba(56, 189, 248, 0.30);
+  background: rgba(56, 189, 248, 0.10);
+}
+.admin-movie-list__badge--DRAFT .admin-movie-list__dot,
+.admin-movie-list__badge--TEMP .admin-movie-list__dot,
+.admin-movie-list__badge--TEMPORARY .admin-movie-list__dot,
+.admin-movie-list__badge--SAVED .admin-movie-list__dot {
+  background: var(--info);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+
+.admin-movie-list__badge--READY,
+.admin-movie-list__badge--UPCOMING,
+.admin-movie-list__badge--SCHEDULED,
+.admin-movie-list__badge--OPENING_SOON {
+  border-color: rgba(245, 158, 11, 0.30);
+  background: rgba(245, 158, 11, 0.10);
+}
+.admin-movie-list__badge--READY .admin-movie-list__dot,
+.admin-movie-list__badge--UPCOMING .admin-movie-list__dot,
+.admin-movie-list__badge--SCHEDULED .admin-movie-list__dot,
+.admin-movie-list__badge--OPENING_SOON .admin-movie-list__dot {
+  background: var(--warn);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16);
+}
+
+.admin-movie-list__badge--PUBLISHED,
+.admin-movie-list__badge--ACTIVE,
+.admin-movie-list__badge--OPEN,
+.admin-movie-list__badge--NOW_SHOWING {
+  border-color: rgba(34, 197, 94, 0.28);
+  background: rgba(34, 197, 94, 0.10);
+}
+.admin-movie-list__badge--PUBLISHED .admin-movie-list__dot,
+.admin-movie-list__badge--ACTIVE .admin-movie-list__dot,
+.admin-movie-list__badge--OPEN .admin-movie-list__dot,
+.admin-movie-list__badge--NOW_SHOWING .admin-movie-list__dot {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+.admin-movie-list__badge--INACTIVE,
+.admin-movie-list__badge--CLOSED,
+.admin-movie-list__badge--DISABLED,
+.admin-movie-list__badge--DELETED {
+  border-color: rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.10);
+}
+.admin-movie-list__badge--INACTIVE .admin-movie-list__dot,
+.admin-movie-list__badge--CLOSED .admin-movie-list__dot,
+.admin-movie-list__badge--DISABLED .admin-movie-list__dot,
+.admin-movie-list__badge--DELETED .admin-movie-list__dot {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .admin-movie-list__top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-movie-list__actions {
+    justify-content: flex-start;
+  }
+
+  .admin-movie-list__card {
+    padding: 16px 14px 12px;
+  }
+
+  .admin-movie-list__thead th,
+  .admin-movie-list__tbody td {
+    padding: 10px 10px;
+  }
+
+  .admin-movie-list__date {
+    width: auto;
+  }
+}
+
+@media (max-width: 540px) {
+  .admin-movie-list {
+    padding: 20px 12px 28px;
+  }
+
+  .admin-movie-list__title {
+    font-size: 20px;
+  }
+
+  /* 좁은 화면에서 날짜/ID는 줄바꿈 허용 */
+  .admin-movie-list__id,
+  .admin-movie-list__date {
+    white-space: nowrap;
+  }
+}
+
+
+/* ===== MovieStatus Badge Mapping ===== */
+
+/* DRAFT - 작성 중 (차분한 블루) */
+.admin-movie-list__badge--DRAFT {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+}
+.admin-movie-list__badge--DRAFT .admin-movie-list__dot {
+  background: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+/* COMING_SOON - 개봉 예정 (기대감 / 옐로우) */
+.admin-movie-list__badge--COMING_SOON {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.14);
+}
+.admin-movie-list__badge--COMING_SOON .admin-movie-list__dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+}
+
+/* NOW_SHOWING - 상영 중 (가장 강조 / 그린) */
+.admin-movie-list__badge--NOW_SHOWING {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.14);
+}
+.admin-movie-list__badge--NOW_SHOWING .admin-movie-list__dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
+/* HIDDEN - 숨김 (중립 / 그레이) */
+.admin-movie-list__badge--HIDDEN {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.12);
+}
+.admin-movie-list__badge--HIDDEN .admin-movie-list__dot {
+  background: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
+}
+
+/* ENDED - 상영 종료 (차분한 퍼플/그레이) */
+.admin-movie-list__badge--ENDED {
+  border-color: rgba(139, 92, 246, 0.30);
+  background: rgba(139, 92, 246, 0.12);
+}
+.admin-movie-list__badge--ENDED .admin-movie-list__dot {
+  background: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+
+/* DELETED - 삭제 (위험 / 레드) */
+.admin-movie-list__badge--DELETED {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.14);
+}
+.admin-movie-list__badge--DELETED .admin-movie-list__dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+

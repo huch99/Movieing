@@ -6,6 +6,7 @@ import com.movieing.movieingbackend.user.entity.UserRole;
 import com.movieing.movieingbackend.user.repository.UserAdminRepository;
 import com.movieing.movieingbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +28,10 @@ import java.util.UUID;
  * 주의:
  * - 운영 환경에서는 사용 여부를 반드시 검토하거나 비활성화 필요
  */
-@Profile("local")
+//@Profile("local")
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class AdminSeedConfig {
 
     /**
@@ -41,6 +43,7 @@ public class AdminSeedConfig {
     @Bean
     CommandLineRunner seedAdmin(UserRepository userRepository, UserAdminRepository userAdminRepository, PasswordEncoder passwordEncoder) {
         return args -> {
+            log.info("Seeding admin user...");
             String adminEmail = "admin@movieing.com";
             if (userRepository.existsByEmail(adminEmail)) return;
 
@@ -63,6 +66,8 @@ public class AdminSeedConfig {
                     .build();
 
             userAdminRepository.save(userAdmin);
+
+            log.info("Admin user created: {}", savedAdmin.getEmail());
         };
     }
 }

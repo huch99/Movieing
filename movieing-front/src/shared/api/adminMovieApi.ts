@@ -3,14 +3,22 @@ import api from "./api";
 
 const BASE = "/admin/movies";
 
+export type Page<T> = {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+};
+
 export const adminMovieApi = {
     async createDraft(initial?: MovieDraftSaveAdminRequestDto) {
         const res = await api.post<ApiResponse<number>>(BASE, initial ?? {});
-        return res.data.data;
+        return res.data.data ?? [];
     },
 
-    async getList() {
-        const res = await api.get<ApiResponse<MovieListItemAdminResponseDto[]>>(BASE);
+    async getList(params?: { page?: number; size?: number }) {
+        const res = await api.get<ApiResponse<MovieListItemAdminResponseDto[]>>(BASE, {params});
         return res.data.data ?? [];
     },
 

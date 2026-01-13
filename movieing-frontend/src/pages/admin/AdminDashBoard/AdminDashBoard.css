@@ -1,0 +1,259 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-dashboard__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-dashboard__title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.admin-dashboard__desc {
+  margin: 6px 0 0 0;
+  opacity: 0.75;
+  font-size: 13px;
+}
+
+.admin-dashboard__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-dashboard__btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.admin-dashboard__btn--primary {
+  border-color: rgba(229, 9, 20, 0.35);
+  background: rgba(229, 9, 20, 0.18);
+  color: #fff;
+}
+
+.admin-dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-dashboard__card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.admin-dashboard__cardLabel {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.admin-dashboard__cardValue {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.admin-dashboard__cardSub {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.admin-dashboard__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.admin-dashboard__panel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.admin-dashboard__panel--span2 {
+  grid-column: span 2;
+}
+
+.admin-dashboard__panelHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.admin-dashboard__panelTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.admin-dashboard__panelHint {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.admin-dashboard__noticeList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-dashboard__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-dashboard__badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.admin-dashboard__badge--info {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-dashboard__badge--warn {
+  background: rgba(255, 200, 0, 0.14);
+}
+
+.admin-dashboard__badge--error {
+  background: rgba(229, 9, 20, 0.18);
+}
+
+.admin-dashboard__noticeTitle {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-dashboard__noticeDesc {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.admin-dashboard__quickGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.admin-dashboard__quick {
+  text-align: left;
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-dashboard__quick:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-dashboard__quickLabel {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.admin-dashboard__quickDesc {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.admin-dashboard__table {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-dashboard__thead,
+.admin-dashboard__tr {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 1.4fr 0.8fr 0.8fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-dashboard__thead {
+  font-size: 12px;
+  opacity: 0.7;
+  padding: 8px 6px;
+}
+
+.admin-dashboard__tr {
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-dashboard__td {
+  font-size: 13px;
+}
+
+.admin-dashboard__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.admin-dashboard__pill {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+}
+
+.admin-dashboard__pill--confirmed {
+  background: rgba(0, 200, 120, 0.14);
+}
+
+.admin-dashboard__pill--pay_failed {
+  background: rgba(255, 200, 0, 0.14);
+}
+
+.admin-dashboard__pill--canceled {
+  background: rgba(229, 9, 20, 0.18);
+}
+
+/* 반응형 */
+@media (max-width: 1100px) {
+  .admin-dashboard__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard__panel--span2 {
+    grid-column: span 1;
+  }
+}
