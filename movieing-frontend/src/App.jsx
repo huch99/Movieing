@@ -8,6 +8,7 @@ import AdminDashBoard from './pages/admin/AdminDashBoard/AdminDashBoard';
 import AdminLayout from './components/admin_layout/AdminLayout';
 import AdminMovieListPage from './pages/admin/movie_pages/AdminMovieListPage';
 import AdminMovieDetailPage from './pages/admin/movie_pages/AdminMovieDetailPage';
+import AdminTheaterListPage from './pages/admin/theater_pages/AdminTheaterListPage';
 
 function decodeBase64Url(str) {
   const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -77,6 +78,7 @@ function App() {
           <Route index element={<AdminDashBoard />} />
           <Route path="/admin/movies" element={<AdminMovieListPage />} />
           <Route path="/admin/movies/:movieId" element={<AdminMovieDetailPage />} />
+          <Route path='/admin/theaters' element={<AdminTheaterListPage />} />
         </Route>
 
         {/* 404 */}
