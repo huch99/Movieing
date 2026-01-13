@@ -15,6 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 영화관(Theater) 관리자 서비스
+ *
+ * - 관리자 기능: 목록/상세 조회, 초안 생성, 임시 저장, 완료 처리, 상태 전환(운영/숨김/종료/삭제)
+ * - 초안(DRAFT) 상태에서만 수정(임시 저장) 및 완료 처리를 허용
+ * - 삭제(DELETED) 상태는 조회/수정/상태 전환에서 예외 처리
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,6 +29,11 @@ public class AdminTheaterService {
 
     private final TheaterRepository theaterRepository;
 
+    /**
+     * 영화관 목록 조회 (관리자)
+     * - 삭제(DELETED) 상태를 제외한 모든 영화관을 조회
+     * - 관리자 영화관 관리 리스트 화면에서 사용
+     */
     @Transactional(readOnly = true)
     public List<TheaterListItemAdminResponseDto> getList() {
         return theaterRepository.findAllByStatusNot(TheaterStatus.DELETED)
@@ -39,8 +51,10 @@ public class AdminTheaterService {
                 ).toList();
     }
 
-    /**,
-     * "초안" 생성
+    /**
+     * 영화관 초안(DRAFT) 생성 (관리자)
+     * - 최소 정보만 가진 DRAFT 상태의 영화관 레코드를 생성
+     * - 생성된 theaterId를 반환하고, 이후 임시 저장/완료 흐름으로 진행
      */
     public Long createDraft() {
         Theater t = Theater.builder()
@@ -50,6 +64,10 @@ public class AdminTheaterService {
         return t.getTheaterId();
     }
 
+    /**
+     * 영화관 상세 조회 (관리자)
+     * - theaterId에 해당하는 영화관의 상세 정보를 반환
+     */
     @Transactional(readOnly = true)
     public TheaterDetailAdminResponseDto getDetail(Long theaterId) {
         Theater t = getEntity(theaterId);
@@ -66,6 +84,11 @@ public class AdminTheaterService {
                 .build();
     }
 
+    /**
+     * 영화관 임시 저장(DRAFT 저장) (관리자)
+     * - DRAFT 상태에서만 허용
+     * - 입력된 값만 반영하는 부분 저장 방식 (null은 "변경하지 않음")
+     */
     public void saveDraft(Long theaterId, TheaterDraftSaveAdminRequestDto req) {
         Theater t = getEntity(theaterId);
 
@@ -81,6 +104,13 @@ public class AdminTheaterService {
         if (req.getCloseTime() != null) t.changeCloseTime(req.getCloseTime());
     }
 
+    /**
+     * 영화관 완료 처리 (관리자)
+     * - DRAFT 상태에서만 허용
+     * - 완료 처리 시 필수값 검증은 DTO(@Valid)에서 1차 수행
+     * - 서비스에서는 정책성 검증(예: 위경도 쌍 입력)을 추가로 수행
+     * - 완료 후 상태는 ACTIVE로 전환
+     */
     public void complete(Long theaterId, TheaterCompleteAdminRequestDto req) {
         Theater t = getEntity(theaterId);
 
@@ -102,29 +132,49 @@ public class AdminTheaterService {
         t.changeTheaterStatus(TheaterStatus.ACTIVE);
     }
 
+    /**
+     * 영화관 운영 상태(ACTIVE) 전환 (관리자)
+     * - 숨김(HIDDEN) 또는 종료(CLOSED) 상태에서 재오픈 용도로 사용
+     */
     public void activate(Long theaterId) {
         Theater t = getEntity(theaterId);
         if (t.getStatus() == TheaterStatus.DELETED) throw new NotFoundException("삭제된 영화관입니다.");
         t.changeTheaterStatus(TheaterStatus.ACTIVE);
     }
 
+    /**
+     * 영화관 숨김(HIDDEN) 전환 (관리자)
+     * - 사용자 노출을 중지하고 싶을 때 사용
+     */
     public void hide(Long theaterId) {
         Theater t = getEntity(theaterId);
         if (t.getStatus() == TheaterStatus.DELETED) throw new NotFoundException("삭제된 영화관입니다.");
         t.changeTheaterStatus(TheaterStatus.HIDDEN);
     }
 
+    /**
+     * 영화관 운영 종료(CLOSED) 전환 (관리자)
+     * - 운영 종료 상태로 전환 (정책에 따라 노출/예매 제한)
+     */
     public void close(Long theaterId) {
         Theater t = getEntity(theaterId);
         if (t.getStatus() == TheaterStatus.DELETED) throw new NotFoundException("삭제된 영화관입니다.");
         t.changeTheaterStatus(TheaterStatus.CLOSED);
     }
 
+    /**
+     * 영화관 삭제(소프트 삭제, DELETED) 처리 (관리자)
+     * - 물리 삭제가 아닌 상태값 변경으로 삭제 처리
+     */
     public void remove(Long theaterId) {
         Theater t = getEntity(theaterId);
         t.changeTheaterStatus(TheaterStatus.DELETED);
     }
 
+    /**
+     * theaterId로 Theater 엔티티 조회
+     * - 존재하지 않으면 NotFoundException 발생
+     */
     private Theater getEntity(Long theaterId) {
         return theaterRepository.findById(theaterId)
                 .orElseThrow(() -> new NotFoundException("영화관을 찾을 수 없습니다. id=" + theaterId));
