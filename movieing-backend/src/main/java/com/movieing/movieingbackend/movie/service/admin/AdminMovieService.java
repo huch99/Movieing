@@ -8,21 +8,36 @@ import com.movieing.movieingbackend.movie.entity.Movie;
 import com.movieing.movieingbackend.movie.entity.MovieStatus;
 import com.movieing.movieingbackend.movie.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
+/**
+ * Admin 영화 관리 서비스
+ *
+ * 제공 기능:
+ * - 영화 초안 생성/임시저장/완료처리/수정/숨김/복구/삭제/상세/목록 조회(Page)
+ *
+ * 예외 정책:
+ * - 상태/업무 규칙 위반: ConflictException(409)
+ * - 리소스 미존재: NotFoundException(404)
+ * - 요청값 오류(날짜 역전 등): BadRequestException(400)
+ */
 @Service
 @RequiredArgsConstructor
 public class AdminMovieService {
 
     private final MovieRepository movieRepository;
 
-    /* =========================
-       Create (기본 DRAFT)
-       ========================= */
+    /**
+     * 영화 초안(DRAFT) 생성
+     *
+     * - Draft 단계는 모든 필드가 optional
+     * - 입력된 값만 저장하고 status는 DRAFT로 유지
+     */
     @Transactional
     public Long createDraft(MovieDraftSaveAdminRequestDto requestDto) {
         Movie movie = Movie.builder()
@@ -36,19 +51,25 @@ public class AdminMovieService {
                 .rating(requestDto.getRating())
                 .posterUrl(requestDto.getPosterUrl())
                 .build();
+        // 명시적으로 Draft 상태 유지 (Builder.Default로 DRAFT여도 의도 표현용)
         movie.saveDraft();
+        // 날짜가 둘 다 있을 때만 범위 체크
         validateDateRangeIfBothPresent(movie.getReleaseDate(), movie.getEndDate());
 
         return movieRepository.save(movie).getMovieId();
     }
 
-    /* =========================
-       Draft Save (임시 저장)
-       - 정책: DRAFT에서만 허용
-       ========================= */
+    /**
+     * 영화 초안 임시 저장(부분 저장)
+     *
+     * 정책:
+     * - DRAFT 상태에서만 허용
+     * - 전달된 값만 부분 반영
+     */
     @Transactional
     public void saveDraft(Long movieId, MovieDraftSaveAdminRequestDto requestDto) {
-        Movie movie = getMovie(movieId);
+
+        Movie movie = getMovieActive(movieId); // DELETED 방어 포함
 
         if (movie.getStatus() != MovieStatus.DRAFT) {
             throw new ConflictException("임시 저장은 DRAFT 상태에서만 가능합니다.");
@@ -66,18 +87,28 @@ public class AdminMovieService {
                 requestDto.getPosterUrl(),
                 null
         );
+        // Draft 유지
         movie.saveDraft();
+        // 날짜가 둘 다 있을 때만 범위 체크
         validateDateRangeIfBothPresent(movie.getReleaseDate(), movie.getEndDate());
     }
 
-    /* =========================
-       Complete (완료 버튼)
-       - DRAFT -> COMING_SOON
-       - 필수값 + 날짜 검증
-       ========================= */
+    /**
+     * 영화 완료 처리 (DRAFT -> COMING_SOON)
+     *
+     * - DTO Validation(@Valid)로 필수값/형식 검증
+     * - 서비스에서는 날짜 상호관계(releaseDate <= endDate) 같은 정책 검증 수행
+     *
+     * (보완) PathVariable movieId와 DTO movieId가 함께 온다면 불일치 방지 체크
+     */
     @Transactional
     public void complete(Long movieId, MovieCompleteAdminRequestDto requestDto) {
-        Movie movie = getMovie(movieId);
+
+        if (requestDto.getMovieId() != null && !movieId.equals(requestDto.getMovieId())) {
+            throw new BadRequestException("movieId가 일치하지 않습니다.");
+        }
+
+        Movie movie = getMovieActive(movieId);
 
         if (movie.getStatus() != MovieStatus.DRAFT) {
             throw new ConflictException("완료 처리는 DRAFT 상태에서만 가능합니다.");
@@ -96,28 +127,24 @@ public class AdminMovieService {
                 null
         );
 
-        validateRequiredForComplete(movie);
+        // 완료 단계는 날짜 필수 + 범위 엄격 검증
         validateDateRangeStrict(movie.getReleaseDate(), movie.getEndDate());
 
-        // 엔티티 전이 규칙 (DRAFT -> COMING_SOON)
+        // 도메인 전이 규칙 (DRAFT -> COMING_SOON)
         movie.complete();
     }
 
-    /* =========================
-       Update (상세 수정)
-       - 정책: DELETED는 수정 불가
-       - 정책은 필요하면 더 강화 가능
-       ========================= */
+    /**
+     * 영화 정보 수정(부분 수정)
+     *
+     * 정책:
+     * - DELETED 상태는 수정 불가
+     * - 전달된 값만 부분 반영
+     * - 날짜는 둘 다 있을 경우에만 범위 체크
+     */
     @Transactional
     public void update(Long movieId, MovieUpdateAdminRequestDto requestDto) {
-        Movie movie = getMovie(movieId);
-
-        if (movie.getStatus() == MovieStatus.DELETED) {
-            throw new ConflictException("삭제된 영화는 수정할 수 없습니다.");
-        }
-
-        // 예: ENDED 수정 막고 싶으면
-        // if (movie.getStatus() == MovieStatus.ENDED) throw new ConflictException("종료된 영화는 수정할 수 없습니다.");
+        Movie movie = getMovieActive(movieId);
 
         movie.updateDetail(
                 requestDto.getTitle(),
@@ -135,74 +162,111 @@ public class AdminMovieService {
         validateDateRangeIfBothPresent(movie.getReleaseDate(), movie.getEndDate());
     }
 
-    /* =========================
-       Admin status controls (선택 기능)
-       - HIDDEN 토글/복구 같은 운영 기능
-       ========================= */
+    /**
+     * 영화 숨김 처리
+     *
+     * - 사용자 화면 노출을 막기 위한 운영 기능
+     * - DELETED는 숨김 처리 불가
+     */
     @Transactional
     public void hide(Long movieId) {
-        Movie movie = getMovie(movieId);
+        Movie movie = getMovieActive(movieId);
 
-        if (movie.getStatus() == MovieStatus.DELETED) {
-            throw new ConflictException("삭제된 영화는 숨김 처리할 수 없습니다.");
-        }
-
-        movie.hide(); // 엔티티에 hide() 구현되어 있어야 함
+        movie.hide();
     }
 
+    /**
+     * 숨김(HIDDEN) 영화 복구
+     *
+     * (보완) 복구 시 날짜 기반으로 상태를 더 자연스럽게 결정
+     * - releaseDate <= today 이면 NOW_SHOWING으로 복구
+     * - 아니면 COMING_SOON으로 복구
+     *
+     * 주의:
+     * - 엔티티에 HIDDEN -> NOW_SHOWING 직접 전이 메서드가 없다면 정책적으로 허용할지 결정 필요.
+     * - 여기서는 "운영 기능"으로 허용한다는 가정 하에 status를 직접 설정하지 않고,
+     *   가능한 경우 도메인 메서드를 활용하는 방식으로 구성.
+     */
     @Transactional
-    public void unhideToComingSoon(Long movieId) {
-        Movie movie = getMovie(movieId);
+    public void unhide(Long movieId) {
+        Movie movie = getMovieActive(movieId);
 
         if (movie.getStatus() != MovieStatus.HIDDEN) {
             throw new ConflictException("HIDDEN 상태에서만 복구할 수 있습니다.");
         }
 
-        // 운영 정책: 숨김 해제하면 COMING_SOON으로 복귀 (원하면 NOW_SHOWING 복귀 등 분기 가능)
+        LocalDate today = LocalDate.now();
+        LocalDate releaseDate = movie.getReleaseDate();
+
+        // 1) 기본 복구: COMING_SOON
         movie.setCommingSoon(); // setStatus 없으면 엔티티에 메서드 추가
+
+        // 2) 개봉일이 오늘 이전/오늘이면 NOW_SHOWING으로 한 번 더 전이
+        if (releaseDate != null && !releaseDate.isAfter(today)) {
+            movie.startShowing(); // COMING_SOON -> NOW_SHOWING
+        }
     }
 
-    /* =========================
-       Delete (Soft delete)
-       ========================= */
+    /**
+     * 영화 소프트 삭제
+     *
+     * - 물리 삭제 대신 DELETED로 전환
+     * - 이미 DELETED면 무시
+     */
     @Transactional
     public void delete(Long movieId) {
         Movie movie = getMovie(movieId);
 
         if (movie.getStatus() == MovieStatus.DELETED) return;
 
-        // 예: NOW_SHOWING 삭제 막고 싶으면
-        // if (movie.getStatus() == MovieStatus.NOW_SHOWING) throw new ConflictException("상영 중인 영화는 삭제할 수 없습니다.");
-
         movie.softDelete();
     }
 
-    /* =========================
-       Read (Admin)
-       ========================= */
-
+    /**
+     * 영화 상세 조회 (Admin)
+     *
+     * (보완) DELETED는 "없는 리소스"처럼 처리하여 상세 조회에서 제외
+     */
     @Transactional(readOnly = true)
     public MovieDetailAdminResponseDto getDetail(Long movieId) {
-        return MovieDetailAdminResponseDto.from(getMovie(movieId));
+        Movie movie = getMovieActive(movieId);
+        return MovieDetailAdminResponseDto.from(movie);
     }
 
+    /**
+     * 영화 목록 조회 (Admin)
+     *
+     * - DELETED 제외
+     * - Page 기반 페이징/정렬 지원
+     */
     @Transactional(readOnly = true)
-    public List<MovieListItemAdminResponseDto> getList() {
-        return movieRepository.findByStatusNot(MovieStatus.DELETED)
-                .stream()
-                .map(MovieListItemAdminResponseDto::from)
-                .toList();
+    public Page<MovieListItemAdminResponseDto> getList(Pageable pageable) {
+        return movieRepository.findByStatusNot(MovieStatus.DELETED, pageable)
+                .map(MovieListItemAdminResponseDto::from);
     }
 
-     /* =========================
-       helpers
-       ========================= */
-
+    /**
+     * 영화 단건 조회
+     */
     private Movie getMovie(Long movieId) {
         return movieRepository.findById(movieId)
                 .orElseThrow(() -> new NotFoundException("영화를 찾을 수 없습니다. id=" + movieId));
     }
 
+    /**
+     * (보완) DELETED는 Admin에서도 "없는 리소스"처럼 처리하고 싶을 때 사용하는 조회 헬퍼
+     */
+    private Movie getMovieActive(Long movieId) {
+        Movie movie = getMovie(movieId);
+        if (movie.getStatus() == MovieStatus.DELETED) {
+            throw new NotFoundException("영화를 찾을 수 없습니다. id=" + movieId);
+        }
+        return movie;
+    }
+
+    /**
+     * 날짜가 둘 다 있을 때만 날짜 범위를 검증 (Draft/Update 단계)
+     */
     private void validateDateRangeIfBothPresent(LocalDate releaseDate, LocalDate endDate) {
         if (releaseDate == null || endDate == null) return;
         if (endDate.isBefore(releaseDate)) {
@@ -210,6 +274,9 @@ public class AdminMovieService {
         }
     }
 
+    /**
+     * 완료 처리 단계에서 날짜 필수 + 날짜 범위 엄격 검증
+     */
     private void validateDateRangeStrict(LocalDate releaseDate, LocalDate endDate) {
         if (releaseDate == null || endDate == null) {
             throw new BadRequestException("개봉일/상영 종료일은 필수입니다.");
@@ -218,20 +285,4 @@ public class AdminMovieService {
             throw new BadRequestException("상영 종료일은 개봉일보다 빠를 수 없습니다.");
         }
     }
-
-    private void validateRequiredForComplete(Movie movie) {
-        if (isBlank(movie.getTitle())) throw new BadRequestException("제목은 필수입니다.");
-        if (isBlank(movie.getSynopsis())) throw new BadRequestException("줄거리는 필수입니다.");
-        if (movie.getRuntimeMin() == null || movie.getRuntimeMin() < 1)
-            throw new BadRequestException("상영 시간(분)은 필수이며 1 이상이어야 합니다.");
-        if (movie.getReleaseDate() == null) throw new BadRequestException("개봉일은 필수입니다.");
-        if (movie.getEndDate() == null) throw new BadRequestException("상영 종료일은 필수입니다.");
-        if (isBlank(movie.getRating())) throw new BadRequestException("관람등급은 필수입니다.");
-    }
-
-    private boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
-    }
-
-
 }

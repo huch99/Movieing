@@ -26,7 +26,11 @@ import java.time.LocalDate;
  */
 @Entity
 @Getter
-@Table(name = "movie")
+@Table(name = "movie", indexes = {
+        @Index(name = "idx_movie_status", columnList = "status"),
+        @Index(name = "idx_movie_release_date", columnList = "release_date"),
+        @Index(name = "idx_movie_end_date", columnList = "end_date")
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
