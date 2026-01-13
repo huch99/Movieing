@@ -1,0 +1,124 @@
+package com.movieing.movieingbackend.theater.controller.admin;
+
+import com.movieing.movieingbackend.aspect.ApiResponse;
+import com.movieing.movieingbackend.theater.dto.admin.TheaterCompleteAdminRequestDto;
+import com.movieing.movieingbackend.theater.dto.admin.TheaterDetailAdminResponseDto;
+import com.movieing.movieingbackend.theater.dto.admin.TheaterDraftSaveAdminRequestDto;
+import com.movieing.movieingbackend.theater.dto.admin.TheaterListItemAdminResponseDto;
+import com.movieing.movieingbackend.theater.service.admin.AdminTheaterService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/admin/theaters")
+public class AdminTheaterController {
+
+    private final AdminTheaterService adminTheaterService;
+
+    /**
+     * 영화관 목록 조회 (관리자)
+     * - DELETED 제외 전체 목록을 조회하는 용도
+     * - 어드민 영화관 관리 리스트 화면에서 사용
+     */
+    @GetMapping
+    public ApiResponse<List<TheaterListItemAdminResponseDto>> getList() {
+        return ApiResponse.success(adminTheaterService.getList());
+    }
+
+    /**
+     * 영화관 초안(DRAFT) 생성 (관리자)
+     * - 빈(혹은 최소값) 상태의 영화관 레코드를 먼저 만들고, 생성된 theaterId를 반환
+     * - 이후 /{theaterId}/draft 저장 → /{theaterId}/complete 완료 흐름으로 진행
+     */
+    @PostMapping("/draft")
+    public ApiResponse<Long> createDraft() {
+        return ApiResponse.success(adminTheaterService.createDraft());
+    }
+
+    /**
+     * 영화관 상세 조회 (관리자)
+     * - 특정 theaterId의 상세 정보를 조회
+     * - 어드민 영화관 상세/수정 화면 진입 시 사용
+     */
+    @GetMapping("/{theaterId}")
+    public ApiResponse<TheaterDetailAdminResponseDto> getDetail(@PathVariable Long theaterId) {
+        return ApiResponse.success(adminTheaterService.getDetail(theaterId));
+    }
+
+    /**
+     * 영화관 임시 저장(DRAFT 저장) (관리자)
+     * - DRAFT 상태에서만 허용되는 부분 저장(Partial Update) 용도
+     * - 입력된 값만 반영하고, null 값은 "변경하지 않음"으로 처리하는 방식이 일반적
+     */
+    @PutMapping("/{theaterId}/draft")
+    public ApiResponse<Void> saveDraft(
+            @PathVariable Long theaterId,
+            @RequestBody TheaterDraftSaveAdminRequestDto req
+    ) {
+        adminTheaterService.saveDraft(theaterId, req);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 영화관 완료 처리 (관리자)
+     * - DRAFT 상태의 영화관을 운영 가능한 상태(ACTIVE)로 전환
+     * - 완료 시 필수값 검증(@Valid)을 통과해야 함
+     * - 정책상 완료 후 상태는 ACTIVE로 전환(또는 필요하면 COMING_SOON 같은 상태로 확장 가능)
+     */
+    @PostMapping("/{theaterId}/complete")
+    public ApiResponse<Void> complete(
+            @PathVariable Long theaterId,
+            @Valid @RequestBody TheaterCompleteAdminRequestDto req
+    ) {
+        adminTheaterService.complete(theaterId, req);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 영화관 운영중(ACTIVE) 전환 (관리자)
+     * - 숨김/종료 상태에서 다시 운영중으로 복구하는 용도
+     * - DELETED는 보통 복구 불가(서비스에서 차단 권장)
+     */
+    @PostMapping("/{theaterId}/activate")
+    public ApiResponse<Void> activate(@PathVariable Long theaterId) {
+        adminTheaterService.activate(theaterId);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 영화관 숨김(HIDDEN) 전환 (관리자)
+     * - 사용자 노출을 끄고 싶을 때 사용
+     * - 데이터는 유지되며, 다시 activate로 복구 가능
+     */
+    @PostMapping("/{theaterId}/hide")
+    public ApiResponse<Void> hide(@PathVariable Long theaterId) {
+        adminTheaterService.hide(theaterId);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 영화관 운영 종료(CLOSED) 전환 (관리자)
+     * - 더 이상 운영하지 않는 영화관으로 전환
+     * - 예매/노출 정책은 서비스 레벨(또는 사용자 조회 API)에서 제어
+     */
+    @PostMapping("/{theaterId}/close")
+    public ApiResponse<Void> close(@PathVariable Long theaterId) {
+        adminTheaterService.close(theaterId);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 영화관 삭제(소프트 삭제, DELETED) (관리자)
+     * - 물리 삭제가 아닌 상태값으로 삭제 처리
+     * - 목록 조회 시 제외되는 것이 일반적
+     */
+    @DeleteMapping("/{theaterId}")
+    public ApiResponse<Void> remove(@PathVariable Long theaterId) {
+        adminTheaterService.remove(theaterId);
+        return ApiResponse.success(null);
+    }
+}

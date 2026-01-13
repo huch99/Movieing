@@ -27,10 +27,10 @@ public class Theater extends BaseTimeEntity {
     @Column(name = "theater_id", nullable = false)
     private Long theaterId;
 
-    @Column(name = "theater_name", nullable = false, length = 255)
+    @Column(name = "theater_name", nullable = true, length = 255)
     private String theaterName;
 
-    @Column(name = "address", nullable = false, length = 255)
+    @Column(name = "address", nullable = true, length = 255)
     private String address;
 
     @Column(name = "lat", nullable = true)
@@ -39,16 +39,16 @@ public class Theater extends BaseTimeEntity {
     @Column(name = "lng", nullable = true)
     private Double lng;
 
-    @Column(name = "open_time", nullable = false)
+    @Column(name = "open_time", nullable = true)
     private LocalTime openTime;
 
-    @Column(name = "close_time", nullable = false)
+    @Column(name = "close_time", nullable = true)
     private LocalTime closeTime;
 
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private TheaterStatus status = TheaterStatus.ACTIVE;
+    private TheaterStatus status = TheaterStatus.DRAFT;
 
     /* ======== Method ======== */
     public void changeTheaterStatus(TheaterStatus theaterStatus) {
@@ -73,5 +73,9 @@ public class Theater extends BaseTimeEntity {
 
     public void changeTheaterName(String theaterName) {
         this.theaterName = theaterName;
+    }
+
+    public void changeAddress(String address) {
+        this.address = address;
     }
 }

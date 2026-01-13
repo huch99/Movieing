@@ -13,6 +13,20 @@ export default function AdminMovieDetailPage() {
     const [form, setForm] = useState<MovieDraftSaveAdminRequestDto>({});
     const [loading, setLoading] = useState(true);
 
+    const RATING_OPTIONS = ["전체이용가", "12세", "15세", "18세"] as const;
+    const GENRE_OPTIONS = [
+        "액션",
+        "드라마",
+        "코미디",
+        "로맨스",
+        "스릴러",
+        "공포",
+        "SF",
+        "판타지",
+        "애니메이션",
+        "다큐멘터리",
+    ] as const;
+
     const load = async () => {
         setLoading(true);
         try {
@@ -147,20 +161,38 @@ export default function AdminMovieDetailPage() {
 
                         <div className="admin-movie-detail__field">
                             <div className="admin-movie-detail__label">장르</div>
-                            <input
-                                className="admin-movie-detail__input"
+                            <select
+                                className="admin-movie-detail__select"
                                 value={String(form.genre ?? "")}
                                 onChange={(e) => onChange("genre", e.target.value)}
-                            />
+                            >
+                                <option value="" disabled>
+                                    선택하세요
+                                </option>
+                                {GENRE_OPTIONS.map((g) => (
+                                    <option key={g} value={g}>
+                                        {g}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="admin-movie-detail__field">
                             <div className="admin-movie-detail__label">관람등급</div>
-                            <input
-                                className="admin-movie-detail__input"
+                            <select
+                                className="admin-movie-detail__select"
                                 value={String(form.rating ?? "")}
                                 onChange={(e) => onChange("rating", e.target.value)}
-                            />
+                            >
+                                <option value="" disabled>
+                                    선택하세요
+                                </option>
+                                {RATING_OPTIONS.map((r) => (
+                                    <option key={r} value={r}>
+                                        {r}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="admin-movie-detail__field">
