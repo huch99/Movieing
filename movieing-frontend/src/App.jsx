@@ -9,6 +9,8 @@ import AdminLayout from './components/admin_layout/AdminLayout';
 import AdminMovieListPage from './pages/admin/movie_pages/AdminMovieListPage';
 import AdminMovieDetailPage from './pages/admin/movie_pages/AdminMovieDetailPage';
 import AdminTheaterListPage from './pages/admin/theater_pages/AdminTheaterListPage';
+import AdminTheaterDetailPage from './pages/admin/theater_pages/AdminTheaterDetailPage';
+import AdminScreenDetailPage from './pages/admin/screen_pages/AdminScreenDetailPage';
 
 function decodeBase64Url(str) {
   const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -75,10 +77,15 @@ function App() {
 
         {/* ✅ 어드민 영역 */}
         <Route path="/admin" element={<AdminLayout user={user} setUser={setUser} />}>
+
           <Route index element={<AdminDashBoard />} />
+          {/* 영화 관리 페이지 */}
           <Route path="/admin/movies" element={<AdminMovieListPage />} />
           <Route path="/admin/movies/:movieId" element={<AdminMovieDetailPage />} />
+          {/* 영화관 / 상영관 관리 페이지 */}
           <Route path='/admin/theaters' element={<AdminTheaterListPage />} />
+          <Route path='/admin/theaters/:theaterId' element={<AdminTheaterDetailPage />} />
+          <Route path='/admin/screens/:screenId' element={<AdminScreenDetailPage />} />
         </Route>
 
         {/* 404 */}
