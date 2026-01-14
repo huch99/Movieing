@@ -1,13 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './AdminMovieListPage.css';
 import { useNavigate } from 'react-router-dom';
 import { adminMovieApi } from './adminMovieApi';
+
+const STATUS_OPTIONS = [
+    { value: "ALL", label: "전체" },
+    { value: "DRAFT", label: "DRAFT" },
+    { value: "COMING_SOON", label: "COMING_SOON" },
+    { value: "NOW_SHOWING", label: "NOW_SHOWING" },
+    { value: "HIDDEN", label: "HIDDEN" },
+    { value: "ENDED", label: "ENDED" },
+    { value: "DELETED", label: "DELETED" },
+];
 
 const AdminMovieListPage = () => {
     const nav = useNavigate();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // 🔹 필터 상태
+    const [status, setStatus] = useState("ALL");
+    const [q, setQ] = useState("");
 
     const load = async () => {
         setLoading(true);
@@ -25,6 +39,27 @@ const AdminMovieListPage = () => {
     useEffect(() => {
         load();
     }, []);
+
+    const filtered = useMemo(() => {
+        const keyword = q.trim().toLowerCase();
+
+        return items
+            .filter((m) => {
+                if (status === "ALL") return true;
+                return m.status === status;
+            })
+            .filter((m) => {
+                if (!keyword) return true;
+                const hay = [
+                    m.movieId,
+                    m.title,
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+                return hay.includes(keyword);
+            });
+    }, [items, status, q]);
 
     const onCreateDraft = async () => {
         try {
@@ -53,6 +88,36 @@ const AdminMovieListPage = () => {
                         <button className="admin-movie-list__create-btn" onClick={onCreateDraft}>
                             영화(초안) 등록
                         </button>
+                    </div>
+                </div>
+
+                 {/* ===== Filters ===== */}
+                <div className="admin-movie-list__filters">
+                    <div className="admin-movie-list__filter">
+                        <label>상태</label>
+                        <select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            {STATUS_OPTIONS.map((o) => (
+                                <option key={o.value} value={o.value}>
+                                    {o.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="admin-movie-list__filter admin-movie-list__filter--grow">
+                        <label>검색</label>
+                        <input
+                            value={q}
+                            onChange={(e) => setQ(e.target.value)}
+                            placeholder="영화 제목 / ID"
+                        />
+                    </div>
+
+                    <div className="admin-movie-list__count">
+                        총 <strong>{filtered.length}</strong>개
                     </div>
                 </div>
 
