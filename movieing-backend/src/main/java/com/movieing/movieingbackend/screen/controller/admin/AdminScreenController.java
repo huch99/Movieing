@@ -5,6 +5,10 @@ import com.movieing.movieingbackend.screen.dto.admin.*;
 import com.movieing.movieingbackend.screen.service.admin.AdminScreenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +22,20 @@ public class AdminScreenController {
 
     /**
      * 상영관 목록 조회 (관리자)
-     * - DELETED 제외 전체 목록을 조회하는 용도
-     * - 어드민 상영관 관리 리스트 화면에서 사용
+     * - 특정 영화관(theaterId)에 속한 상영관 목록 조회
+     * - DELETED 상태 제외
+     * - 관리자 상영관 관리 화면에서 사용
      */
-    @GetMapping
-    public ApiResponse<List<ScreenListItemAdminResponseDto>> getList() {
-        return ApiResponse.success(adminScreenService.getList());
+    @GetMapping("/{theaterId}/getList")
+    public ApiResponse<Page<ScreenListItemAdminResponseDto>> getList(
+            @PathVariable Long theaterId,
+            @PageableDefault(
+                    size = 20,
+                    sort = "updatedAt",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return ApiResponse.success(adminScreenService.getList(theaterId, pageable));
     }
 
     /**
@@ -34,9 +46,11 @@ public class AdminScreenController {
      * 주의:
      * - 초안 생성이 body 없이 가능하려면 Screen 엔티티의 theater/screenName이 DRAFT 단계에서 null 허용이어야 함
      */
-    @PostMapping("/draft")
-    public ApiResponse<Long> createDraft() {
-        return ApiResponse.success(adminScreenService.createDraft());
+    @PostMapping("/{theaterId}/screens/draft")
+    public ApiResponse<Long> createDraft(
+            @PathVariable Long theaterId
+    ) {
+        return ApiResponse.success(adminScreenService.createDraft(theaterId));
     }
 
     /**
