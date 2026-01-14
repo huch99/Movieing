@@ -10,6 +10,8 @@ import com.movieing.movieingbackend.theater.entity.Theater;
 import com.movieing.movieingbackend.theater.entity.TheaterStatus;
 import com.movieing.movieingbackend.theater.repository.TheaterRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +29,12 @@ public class AdminScreenService {
      * 상영관 목록 조회 (관리자)
      * - DELETED 제외 목록 조회
      */
-    public List<ScreenListItemAdminResponseDto> getList() {
-        return screenRepository.findAll().stream()
-                .filter(screen -> screen.getStatus() != ScreenStatus.DELETED)
-                .map(this::toListItemDto)
-                .toList();
+    public Page<ScreenListItemAdminResponseDto> getList(Long TheaterId, Pageable pageable) {
+        Theater theater = getTheaterEntity(TheaterId);
+
+        return screenRepository
+                .findByTheater_TheaterIdAndStatusNot(theater.getTheaterId(), ScreenStatus.DELETED, pageable)
+                .map(ScreenListItemAdminResponseDto::from);
     }
 
     /**
@@ -51,8 +54,11 @@ public class AdminScreenService {
      * - Screen 엔티티의 theater/screenName 컬럼이 DRAFT 단계에서 null 허용 상태여야 함
      */
     @Transactional
-    public Long createDraft() {
+    public Long createDraft(Long theatherId) {
+        Theater theater = getTheaterEntity(theatherId);
+
         Screen screen = Screen.builder()
+                .theater(theater)
                 .status(ScreenStatus.DRAFT)
                 .capacity(0)
                 .build();
@@ -88,6 +94,16 @@ public class AdminScreenService {
         // 수용 인원 변경
         if (req.getCapacity() != null) {
             screen.changeCapacity(req.getCapacity());
+        }
+
+        // 좌석 열 수 변경
+        if (req.getSeatRowCount() != null) {
+            screen.changeSeatRowCount(req.getSeatRowCount());
+        }
+
+        // 좌석 행 수 변경
+        if (req.getSeatColCount() != null) {
+            screen.changeSeatColCount(req.getSeatColCount());
         }
     }
 
@@ -130,6 +146,16 @@ public class AdminScreenService {
         if (req.getCapacity() != null) {
             screen.changeCapacity(req.getCapacity()); // 엔티티에서 0 이상 검증
         }
+
+        // 좌석 열 수 변경
+        if (req.getSeatRowCount() != null) {
+            screen.changeSeatRowCount(req.getSeatRowCount());
+        }
+
+        // 좌석 행 수 변경
+        if (req.getSeatColCount() != null) {
+            screen.changeSeatColCount(req.getSeatColCount());
+        }
     }
 
     /**
@@ -151,6 +177,8 @@ public class AdminScreenService {
         screen.changeTheater(theater);
         screen.changeScreenName(req.getScreenName());
         screen.changeCapacity(req.getCapacity());
+        screen.changeSeatRowCount(req.getSeatRowCount());
+        screen.changeSeatColCount(req.getSeatColCount());
 
         // 상태 전이
         screen.changeScreenStatus(ScreenStatus.ACTIVE);
@@ -272,6 +300,8 @@ public class AdminScreenService {
                 .theaterId(screen.getTheater() != null ? screen.getTheater().getTheaterId() : null)
                 .screenName(screen.getScreenName())
                 .capacity(screen.getCapacity())
+                .seatColCount(screen.getSeatColCount())
+                .seatRowCount(screen.getSeatRowCount())
                 .status(screen.getStatus())
                 .build();
     }

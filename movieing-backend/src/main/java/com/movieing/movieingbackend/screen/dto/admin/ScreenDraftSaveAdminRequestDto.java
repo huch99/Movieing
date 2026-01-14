@@ -24,5 +24,8 @@ public class ScreenDraftSaveAdminRequestDto {
 
     @Min(value = 0, message = "수용 인원은 0 이상이어야 합니다.")
     private Integer capacity;   // 수용 인원 (선택, 0 이상)
+    
+    private Integer seatRowCount; // 좌석 열 수 변경
+    private Integer seatColCount; // 좌석 행 수 변경
 
 }

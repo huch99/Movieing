@@ -23,4 +23,6 @@ public class ScreenDetailAdminResponseDto {
     private String screenName;      // 상영관 이름
     private Integer capacity;       // 수용 인원
     private ScreenStatus status;    // 상영관 상태
+    private Integer seatRowCount;   // 좌석 열
+    private Integer seatColCount;   // 좌석 행
 }

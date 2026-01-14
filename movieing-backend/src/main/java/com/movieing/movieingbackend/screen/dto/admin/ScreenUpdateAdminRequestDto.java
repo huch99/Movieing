@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ScreenUpdateAdminRequestDto {
     private Long theaterId;     // 소속 영화관 변경 (선택)
-
     private String screenName;  // 상영관 이름 변경 (선택)
-
     private Integer capacity;   // 수용 인원 변경 (선택, 0 이상 정책은 서비스에서 검증)
+    private Integer seatRowCount;   // 좌석 열 수 변경
+    private Integer seatColCount;   // 좌석 행 수 변경
 }

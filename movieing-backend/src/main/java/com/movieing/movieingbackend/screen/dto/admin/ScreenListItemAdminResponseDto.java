@@ -23,4 +23,14 @@ public class ScreenListItemAdminResponseDto {
     private String screenName;      // 상영관 이름
     private Integer capacity;       // 수용 인원
     private ScreenStatus status;    // 상영관 상태
+
+    public static ScreenListItemAdminResponseDto from(Screen screen) {
+        return ScreenListItemAdminResponseDto.builder()
+                .screenId(screen.getScreenId())
+                .theaterId(screen.getTheater().getTheaterId())
+                .screenName(screen.getScreenName())
+                .capacity(screen.getCapacity())
+                .status(screen.getStatus())
+                .build();
+    }
 }

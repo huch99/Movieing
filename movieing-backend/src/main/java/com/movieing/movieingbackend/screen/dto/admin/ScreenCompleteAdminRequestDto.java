@@ -31,6 +31,14 @@ public class ScreenCompleteAdminRequestDto {
     private String screenName;  // 상영관 이름 (필수)
 
     @NotNull(message = "수용 인원은 필수입니다.")
-    @Min(value = 0, message = "수용 인원은 0 이상이어야 합니다.")
+    @Min(value = 1, message = "수용 인원은 1 이상이어야 합니다.")
     private Integer capacity;   // 수용 인원 (필수, 0 이상)
+
+    @NotNull(message = "좌석 열 수는 필수입니다.")
+    @Min(value = 1, message = "좌석 열 수는 1 이상이어야 합니다.")
+    private Integer seatRowCount;
+
+    @NotNull(message = "좌석 행 수는 필수입니다.")
+    @Min(value = 1, message = "좌석 행 수는 1 이상이어야 합니다.")
+    private Integer seatColCount;
 }

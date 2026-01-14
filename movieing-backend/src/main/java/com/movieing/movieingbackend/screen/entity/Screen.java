@@ -52,6 +52,13 @@ public class Screen extends BaseTimeEntity {
     @Builder.Default
     private Integer capacity = 0; // 수용 인원 (기본 0, 운영 정책에 따라 0 허용/불허 결정)
 
+    // ✅ 추가: 좌석 배치용 행/열
+    @Column(name = "seat_row_count", nullable = true)
+    private Integer seatRowCount; // 예: 10 (A~J)
+
+    @Column(name = "seat_col_count", nullable = true)
+    private Integer seatColCount; // 예: 12 (1~12)
+
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -113,6 +120,28 @@ public class Screen extends BaseTimeEntity {
         }
 
         this.capacity = capacity;
+    }
+
+    /**
+    * 좌석 열 수 변경
+    * */
+    public void changeSeatRowCount(Integer seatRowCount) {
+        ensureNotDeleted();
+        if (seatRowCount == null || seatRowCount <= 0) {
+            throw new BadRequestException("좌석 행 수는 1 이상이어야 합니다.");
+        }
+        this.seatRowCount = seatRowCount;
+    }
+
+    /**
+     * 좌석 행 수 변경
+     * */
+    public void changeSeatColCount(Integer seatColCount) {
+        ensureNotDeleted();
+        if (seatColCount == null || seatColCount <= 0) {
+            throw new BadRequestException("좌석 열 수는 1 이상이어야 합니다.");
+        }
+        this.seatColCount = seatColCount;
     }
 
     /**
