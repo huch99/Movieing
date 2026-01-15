@@ -5,6 +5,7 @@ import com.movieing.movieingbackend.user.entity.UserAdmin;
 import com.movieing.movieingbackend.user.entity.UserRole;
 import com.movieing.movieingbackend.user.repository.UserAdminRepository;
 import com.movieing.movieingbackend.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -28,7 +29,6 @@ import java.util.UUID;
  * 주의:
  * - 운영 환경에서는 사용 여부를 반드시 검토하거나 비활성화 필요
  */
-//@Profile("local")
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
@@ -41,13 +41,12 @@ public class AdminSeedConfig {
      * - 이미 관리자 계정이 존재하면 아무 작업도 수행하지 않음
      */
     @Bean
-    CommandLineRunner seedAdmin(UserRepository userRepository, UserAdminRepository userAdminRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner seedAdmin(UserRepository userRepository, UserAdminRepository userAdminRepository, PasswordEncoder passwordEncoder , EntityManager em) {
         return args -> {
             log.info("Seeding admin user...");
             String adminEmail = "admin@movieing.com";
             if (userRepository.existsByEmail(adminEmail)) return;
 
-            // 1. User 생성 (publicUserId, agreeAt은 @PrePersist에서 자동 처리)
             User admin = User.builder()
                     .userName("ADMIN")
                     .email(adminEmail)
@@ -59,10 +58,12 @@ public class AdminSeedConfig {
 
             User savedAdmin = userRepository.save(admin);
 
-            // 2. UserAdmin 생성 (PK 공유, @MapsId 구조)
+            // ✅ 핵심: managed reference로 연결
+            User ref = em.getReference(User.class, savedAdmin.getUserId());
+
             UserAdmin userAdmin = UserAdmin.builder()
-                    .user(savedAdmin)
-                    .theater(null)   // 아직 소속 영화관 없음
+                    .user(ref)
+                    .theater(null)
                     .build();
 
             userAdminRepository.save(userAdmin);
