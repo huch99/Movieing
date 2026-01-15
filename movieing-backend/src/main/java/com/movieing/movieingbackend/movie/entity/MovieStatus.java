@@ -7,7 +7,7 @@ package com.movieing.movieingbackend.movie.entity;
  * - Admin 영역에서 상태 전이를 통해 영화 운영 상태를 관리
  *
  * 기본 흐름:
- * DRAFT → COMING_SOON → NOW_SHOWING → ENDED
+ * DRAFT → COMMING_SOON → NOW_SHOWING → ENDED
  *
  * 예외 흐름:
  * - 운영자 판단에 따라 HIDDEN 처리 가능
@@ -16,7 +16,7 @@ package com.movieing.movieingbackend.movie.entity;
 public enum MovieStatus {
     DRAFT,        // 작성 중(임시 저장 상태, 사용자 노출 X)
 
-    COMING_SOON,  // 개봉 예정 (사용자 노출 O, 예매 가능 정책 적용 가능)
+    COMMING_SOON, // 개봉 예정 (사용자 노출 O, 예매 가능 정책 적용 가능)
 
     NOW_SHOWING,  // 상영 중 (사용자 노출 O, 예매 가능)
 

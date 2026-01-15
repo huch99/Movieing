@@ -19,7 +19,7 @@ import java.util.List;
  * - 수동(Admin) 조작 없이도 영화 상태가 날짜에 맞게 유지되도록 보조
  *
  * 상태 전이 규칙:
- * - COMING_SOON → NOW_SHOWING : releaseDate <= 오늘
+ * - COMMING_SOON → NOW_SHOWING : releaseDate <= 오늘
  * - NOW_SHOWING → ENDED       : endDate < 오늘
  *
  * 주의:
@@ -37,7 +37,7 @@ public class MovieStatusScheduler {
      * 매일 00:10 실행 (서버 시간 기준)
      *
      * - 개봉일(releaseDate)이 오늘 이전(또는 오늘)인
-     *   COMING_SOON 상태의 영화를 NOW_SHOWING 상태로 전환
+     *   COMMING_SOON 상태의 영화를 NOW_SHOWING 상태로 전환
      */
     @Transactional
     @Scheduled(cron = "0 10 0 * * *")
@@ -45,14 +45,14 @@ public class MovieStatusScheduler {
 
         LocalDate today = LocalDate.now();
         List<Movie> targets =
-                movieRepository.findByStatusAndReleaseDateLessThanEqual(MovieStatus.COMING_SOON, today);
+                movieRepository.findByStatusAndReleaseDateLessThanEqual(MovieStatus.COMMING_SOON, today);
 
         for (Movie movie : targets) {
             movie.startShowing();
         }
 
         if (!targets.isEmpty()) {
-            log.info("MovieStatusScheduler: COMING_SOON -> NOW_SHOWING count={}", targets.size());
+            log.info("MovieStatusScheduler: COMMING_SOON -> NOW_SHOWING count={}", targets.size());
         }
     }
 

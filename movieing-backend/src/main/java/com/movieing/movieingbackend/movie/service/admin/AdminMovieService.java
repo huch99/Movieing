@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Admin 영화 관리 서비스
@@ -31,6 +34,59 @@ import java.time.LocalDate;
 public class AdminMovieService {
 
     private final MovieRepository movieRepository;
+
+    /**
+     * 상태 목록으로 영화 목록 조회
+     *
+     * <p>
+     * Admin 영역에서 특정 상태의 영화만 조회할 때 사용한다.
+     * 주로 스케줄 등록 시 선택 가능한 영화 목록을 구성하기 위해 사용된다.
+     * </p>
+     *
+     * @param statuses 조회할 영화 상태 목록
+     * @return 상태 조건에 맞는 영화 목록 DTO
+     */
+    public List<MovieListItemAdminResponseDto> getListByStatuses(List<MovieStatus> statuses) {
+        return movieRepository.findByStatusIn(statuses).stream()
+                .map(m -> MovieListItemAdminResponseDto.builder()
+                        .movieId(m.getMovieId())
+                        .title(m.getTitle())
+                        .releaseDate(m.getReleaseDate())
+                        .endDate(m.getEndDate())
+                        .status(m.getStatus())
+                        .posterUrl(m.getPosterUrl())
+                        .build())
+                .toList();
+    }
+
+    /**
+     * 요청 파라미터로 전달된 상태 문자열을 MovieStatus 목록으로 변환
+     *
+     * <p>
+     * - "COMMING_SOON,NOW_SHOWING" 형태의 문자열을 파싱한다.
+     * - 파라미터가 없거나 비어있는 경우 기본 상태 목록을 반환한다.
+     * - Admin 컨트롤러에서 공통 유틸 용도로 사용된다.
+     * </p>
+     *
+     * @param raw 요청 파라미터 상태 문자열 (comma-separated)
+     * @param defaultStatuses 파라미터가 없을 때 사용할 기본 상태 목록
+     * @return 파싱된 MovieStatus 목록
+     * @throws IllegalArgumentException 잘못된 상태 문자열이 전달된 경우
+     */
+    public List<MovieStatus> parseStatusesOrDefault(String raw, List<MovieStatus> defaultStatuses) {
+        if (raw == null || raw.isBlank()) return defaultStatuses;
+
+        List<String> tokens = Arrays.stream(raw.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toList();
+
+        if (tokens.isEmpty()) return defaultStatuses;
+
+        return tokens.stream()
+                .map(MovieStatus::valueOf)
+                .collect(Collectors.toList());
+    }
 
     /**
      * 영화 초안(DRAFT) 생성
@@ -94,7 +150,7 @@ public class AdminMovieService {
     }
 
     /**
-     * 영화 완료 처리 (DRAFT -> COMING_SOON)
+     * 영화 완료 처리 (DRAFT -> COMMING_SOON)
      *
      * - DTO Validation(@Valid)로 필수값/형식 검증
      * - 서비스에서는 날짜 상호관계(releaseDate <= endDate) 같은 정책 검증 수행
@@ -130,7 +186,7 @@ public class AdminMovieService {
         // 완료 단계는 날짜 필수 + 범위 엄격 검증
         validateDateRangeStrict(movie.getReleaseDate(), movie.getEndDate());
 
-        // 도메인 전이 규칙 (DRAFT -> COMING_SOON)
+        // 도메인 전이 규칙 (DRAFT -> COMMING_SOON)
         movie.complete();
     }
 
@@ -180,7 +236,7 @@ public class AdminMovieService {
      *
      * (보완) 복구 시 날짜 기반으로 상태를 더 자연스럽게 결정
      * - releaseDate <= today 이면 NOW_SHOWING으로 복구
-     * - 아니면 COMING_SOON으로 복구
+     * - 아니면 COMMING_SOON으로 복구
      *
      * 주의:
      * - 엔티티에 HIDDEN -> NOW_SHOWING 직접 전이 메서드가 없다면 정책적으로 허용할지 결정 필요.
@@ -198,12 +254,12 @@ public class AdminMovieService {
         LocalDate today = LocalDate.now();
         LocalDate releaseDate = movie.getReleaseDate();
 
-        // 1) 기본 복구: COMING_SOON
+        // 1) 기본 복구: COMMING_SOON
         movie.setCommingSoon(); // setStatus 없으면 엔티티에 메서드 추가
 
         // 2) 개봉일이 오늘 이전/오늘이면 NOW_SHOWING으로 한 번 더 전이
         if (releaseDate != null && !releaseDate.isAfter(today)) {
-            movie.startShowing(); // COMING_SOON -> NOW_SHOWING
+            movie.startShowing(); // COMMING_SOON -> NOW_SHOWING
         }
     }
 

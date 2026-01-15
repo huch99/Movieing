@@ -22,7 +22,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     /**
      * 특정 상태이면서, 개봉일이 기준 날짜 이전(또는 동일)인 영화 조회
      *
-     * - 예: NOW_SHOWING 또는 COMING_SOON 중
+     * - 예: NOW_SHOWING 또는 COMMING_SOON 중
      * - 오늘 날짜 기준으로 노출 가능한 영화 조회 시 사용
      */
     List<Movie> findByStatusAndReleaseDateLessThanEqual(MovieStatus status, LocalDate date);
@@ -44,4 +44,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
      * - 물리 삭제 대신 소프트 삭제 정책을 적용하기 위한 조회 메서드
      */
     Page<Movie> findByStatusNot(MovieStatus status, Pageable pageable);
+
+    List<Movie> findByStatusIn(List<MovieStatus> statuses);
 }

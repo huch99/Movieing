@@ -14,11 +14,11 @@ import java.time.LocalDate;
  * 영화(Movie) 엔티티
  * <p>
  * - 영화 예매 서비스에서 상영 대상이 되는 영화 정보를 관리
- * - Admin 영역에서 단계적 등록(DRAFT → COMING_SOON → NOW_SHOWING → ENDED)을 지원
+ * - Admin 영역에서 단계적 등록(DRAFT → COMMING_SOON → NOW_SHOWING → ENDED)을 지원
  * - 물리 삭제 대신 status 기반 상태 관리(Soft Delete) 적용
  * <p>
  * 상태 흐름:
- * DRAFT → COMING_SOON → NOW_SHOWING → ENDED
+ * DRAFT → COMMING_SOON → NOW_SHOWING → ENDED
  * ↓
  * HIDDEN
  * ↓
@@ -119,23 +119,23 @@ public class Movie extends BaseTimeEntity {
      * 영화 등록 완료 처리
      * <p>
      * - DRAFT 상태에서만 가능
-     * - COMING_SOON 상태로 전환
+     * - COMMING_SOON 상태로 전환
      */
     public void complete() {
         if (this.status != MovieStatus.DRAFT) {
             throw new ConflictException("DRAFT 상태에서만 완료 처리할 수 있습니다.");
         }
-        this.status = MovieStatus.COMING_SOON;
+        this.status = MovieStatus.COMMING_SOON;
     }
 
     /**
      * 상영 시작 처리
      * <p>
-     * - COMING_SOON 상태에서만 가능
+     * - COMMING_SOON 상태에서만 가능
      */
     public void startShowing() {
-        if (this.status != MovieStatus.COMING_SOON) {
-            throw new ConflictException("COMING_SOON 상태에서만 상영 시작할 수 있습니다.");
+        if (this.status != MovieStatus.COMMING_SOON) {
+            throw new ConflictException("COMMING_SOON 상태에서만 상영 시작할 수 있습니다.");
         }
         this.status = MovieStatus.NOW_SHOWING;
     }
@@ -177,6 +177,6 @@ public class Movie extends BaseTimeEntity {
      * - 일반적인 흐름에서는 complete() 사용 권장
      */
     public void setCommingSoon() {
-        this.status = MovieStatus.COMING_SOON;
+        this.status = MovieStatus.COMMING_SOON;
     }
 }
