@@ -395,3 +395,73 @@
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
 }
 
+/* ===== Movie List Filters ===== */
+
+.admin-movie-list__filters {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-movie-list__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-movie-list__filter label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(229, 231, 235, 0.7);
+}
+
+.admin-movie-list__filter select,
+.admin-movie-list__filter input {
+  width: 220px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 23, 0.25);
+  color: rgba(229, 231, 235, 0.92);
+  font-size: 13px;
+  outline: none;
+}
+
+.admin-movie-list__filter--grow input {
+  width: min(420px, 100%);
+}
+
+.admin-movie-list__filter select:focus,
+.admin-movie-list__filter input:focus {
+  border-color: rgba(124, 58, 237, 0.45);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+
+.admin-movie-list__count {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.6);
+  font-weight: 700;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 820px) {
+  .admin-movie-list__filter select,
+  .admin-movie-list__filter input {
+    width: 100%;
+  }
+
+  .admin-movie-list__count {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+

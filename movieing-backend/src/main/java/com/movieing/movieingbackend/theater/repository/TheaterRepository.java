@@ -29,4 +29,6 @@ public interface TheaterRepository extends JpaRepository<Theater, Long> {
      * @return 상태가 status가 아닌 영화관 목록
      */
     List<Theater> findAllByStatusNot(TheaterStatus status);
+
+    List<Theater> findByStatusIn(List<TheaterStatus> statuses);
 }

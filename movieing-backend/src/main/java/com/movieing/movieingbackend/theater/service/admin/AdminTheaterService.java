@@ -27,6 +27,21 @@ public class AdminTheaterService {
     private final TheaterRepository theaterRepository;
 
     /**
+     * 상태 조건으로 영화관 목록 조회 (Admin)
+     */
+    public List<TheaterListItemAdminResponseDto> getListByStatuses(List<TheaterStatus> statuses) {
+        return theaterRepository.findByStatusIn(statuses)
+                .stream()
+                .map(theater -> TheaterListItemAdminResponseDto.builder()
+                        .theaterId(theater.getTheaterId())
+                        .theaterName(theater.getTheaterName())
+                        .status(theater.getStatus())
+                        .build()
+                )
+                .toList();
+    }
+
+    /**
      * 영화관 목록 조회 (관리자)
      * - 삭제(DELETED) 상태를 제외한 모든 영화관을 조회
      * - 관리자 영화관 관리 리스트 화면에서 사용

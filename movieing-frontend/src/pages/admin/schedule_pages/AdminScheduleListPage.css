@@ -1,0 +1,317 @@
+/* AdminScheduleListPage.css */
+/* ✅ AdminTheaterListPage.css 톤/레이아웃과 동일하게 "완전한" 파일로 구성 */
+
+.admin-theater-list {
+  min-height: calc(100vh - 120px);
+  padding: 28px 18px 36px;
+  background:
+    radial-gradient(900px 450px at 20% 10%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(700px 420px at 80% 15%, rgba(56, 189, 248, 0.12), transparent 55%),
+    linear-gradient(180deg, #0b0f1a, #0f172a);
+  color: #e5e7eb;
+}
+
+/* page width wrapper */
+.admin-theater-list__header,
+.admin-theater-list__filters,
+.admin-theater-list__table-wrap,
+.pager {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+.admin-theater-list__header {
+  padding: 20px 20px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.03)
+  );
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.admin-theater-list__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.admin-theater-list__desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: rgba(229, 231, 235, 0.6);
+  font-weight: 600;
+}
+
+/* ===== Header Actions ===== */
+.admin-theater-list__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-theater-list__actions button {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.55);
+  color: rgba(229, 231, 235, 0.9);
+}
+
+.admin-theater-list__actions button:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.admin-theater-list__actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 강조 버튼(두번째 버튼이 +스케줄 등록이라 가정) */
+.admin-theater-list__actions button:last-child {
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.95), rgba(109, 40, 217, 0.95));
+  color: #fff;
+}
+.admin-theater-list__actions button:last-child:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+/* ===== Filters ===== */
+.admin-theater-list__filters {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-theater-list__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-theater-list__filter label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(229, 231, 235, 0.7);
+}
+
+.admin-theater-list__filter select,
+.admin-theater-list__filter input {
+  width: 220px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 23, 0.25);
+  color: rgba(229, 231, 235, 0.92);
+  font-size: 13px;
+  outline: none;
+}
+
+.admin-theater-list__filter select:focus,
+.admin-theater-list__filter input:focus {
+  border-color: rgba(124, 58, 237, 0.45);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+
+.admin-theater-list__count {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.6);
+  font-weight: 700;
+}
+
+/* ===== Table Wrap ===== */
+.admin-theater-list__table-wrap {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.admin-theater-list__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.admin-theater-list__table thead th {
+  text-align: left;
+  padding: 12px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229, 231, 235, 0.75);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.25);
+}
+
+.admin-theater-list__table tbody td {
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  color: rgba(229, 231, 235, 0.9);
+}
+
+.admin-theater-list__table tbody tr:hover td {
+  background: rgba(15, 23, 42, 0.35);
+}
+
+/* empty row */
+.admin-theater-list__empty {
+  padding: 18px 12px;
+  text-align: center;
+  color: rgba(229, 231, 235, 0.55);
+  font-weight: 700;
+}
+
+/* ===== Status Badge (span.status-badge.status-XXX) ===== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.45);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+/* status colors (ScheduleStatus) */
+.status-DRAFT {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+}
+.status-DRAFT::before {
+  background: #38bdf8;
+}
+
+.status-OPEN {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.14);
+}
+.status-OPEN::before {
+  background: #22c55e;
+}
+
+.status-CLOSED {
+  border-color: rgba(139, 92, 246, 0.30);
+  background: rgba(139, 92, 246, 0.12);
+}
+.status-CLOSED::before {
+  background: #8b5cf6;
+}
+
+.status-CANCELLED {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.12);
+}
+.status-CANCELLED::before {
+  background: #94a3b8;
+}
+
+.status-DELETED {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.14);
+  text-decoration: line-through;
+}
+.status-DELETED::before {
+  background: #ef4444;
+}
+
+/* ===== Pager ===== */
+.pager {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.pager button {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.55);
+  color: rgba(229, 231, 235, 0.9);
+}
+
+.pager button:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pager__info {
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.65);
+  font-weight: 800;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 820px) {
+  .admin-theater-list__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-theater-list__actions {
+    justify-content: flex-start;
+  }
+
+  .admin-theater-list__filter select,
+  .admin-theater-list__filter input {
+    width: 100%;
+  }
+
+  .admin-theater-list__count {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .admin-theater-list__table-wrap {
+    padding: 12px;
+  }
+}
