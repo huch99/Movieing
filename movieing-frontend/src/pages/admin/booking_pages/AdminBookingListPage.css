@@ -1,0 +1,304 @@
+/* AdminBookingListPage.css */
+
+/* ===== Theme tokens ===== */
+:root {
+  --bg: #0b0f1a;
+  --bg2: #0f172a;
+  --card: rgba(17, 24, 39, 0.72);
+  --card2: rgba(2, 6, 23, 0.35);
+  --border: rgba(148, 163, 184, 0.14);
+  --border2: rgba(148, 163, 184, 0.18);
+  --text: #e5e7eb;
+  --muted: rgba(229, 231, 235, 0.62);
+  --muted2: rgba(229, 231, 235, 0.42);
+
+  --accent: #7c3aed;
+  --accent2: #a78bfa;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #22c55e;
+  --info: #38bdf8;
+
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --radius: 18px;
+}
+
+/* ===== Page layout ===== */
+.admin-booking-list {
+  min-height: calc(100vh - 120px);
+  padding: 28px 18px 36px;
+  background:
+    radial-gradient(900px 450px at 15% 10%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(700px 420px at 85% 15%, rgba(56, 189, 248, 0.12), transparent 55%),
+    radial-gradient(900px 520px at 50% 110%, rgba(16, 185, 129, 0.08), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  color: var(--text);
+}
+
+.admin-booking-list__card {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 20px 20px 14px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== Header area ===== */
+.admin-booking-list__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 6px 14px;
+}
+
+.admin-booking-list__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-booking-list__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.admin-booking-list__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* ===== Filters ===== */
+.admin-booking-list__fileters {
+  width: min(1120px, 100%);
+  margin: 14px auto 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-booking-list__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-booking-list__filter label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(229, 231, 235, 0.7);
+}
+
+.admin-booking-list__filter select,
+.admin-booking-list__filter input {
+  width: 220px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 23, 0.25);
+  color: rgba(229, 231, 235, 0.92);
+  font-size: 13px;
+  outline: none;
+}
+
+.admin-booking-list__filter select:focus,
+.admin-booking-list__filter input:focus {
+  border-color: rgba(124, 58, 237, 0.45);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+
+.admin-booking-list__count {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.6);
+  font-weight: 700;
+}
+
+/* ===== Table wrap ===== */
+.admin-booking-list__table-wrap {
+  width: min(1120px, 100%);
+  margin: 10px auto 0;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.40), rgba(2, 6, 23, 0.20));
+  overflow: hidden;
+}
+
+/* ===== Table ===== */
+.admin-booking-list__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-booking-list__thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(229, 231, 235, 0.78);
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.52);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-booking-list__tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(229, 231, 235, 0.88);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  background: rgba(2, 6, 23, 0.10);
+  vertical-align: middle;
+}
+
+/* zebra + hover */
+.admin-booking-list__tbody tr:nth-child(even) td {
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.admin-booking-list-row {
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.admin-booking-list-row:hover td {
+  background: rgba(124, 58, 237, 0.10);
+}
+
+.admin-booking-list-row:active td {
+  background: rgba(124, 58, 237, 0.14);
+}
+
+/* columns */
+.admin-booking-list__bookingNo {
+  width: 160px;
+  color: rgba(229, 231, 235, 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-booking-list__title {
+  font-weight: 760;
+  letter-spacing: -0.01em;
+}
+
+.admin-booking-list__userName {
+  width: 160px;
+  color: rgba(229, 231, 235, 0.78);
+}
+
+.admin-booking-list__totalAmount {
+  width: 140px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Empty row */
+.admin-booking-list__empty {
+  text-align: center;
+  padding: 22px 14px !important;
+  color: rgba(229, 231, 235, 0.60);
+}
+
+/* ===== Cancel Button ===== */
+.admin-booking-list__cancelBtn {
+  appearance: none;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.10);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, border-color 140ms ease;
+  white-space: nowrap;
+}
+
+.admin-booking-list__cancelBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  border-color: rgba(239, 68, 68, 0.42);
+  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.18);
+}
+
+.admin-booking-list__cancelBtn:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+.admin-booking-list__cancelBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.18),
+    0 14px 28px rgba(239, 68, 68, 0.18);
+}
+
+/* row 클릭과 버튼 클릭 충돌 방지(버튼 클릭만 먹게) */
+.admin-booking-list__cancelBtn {
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .admin-booking-list__top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-booking-list__card {
+    padding: 16px 14px 12px;
+  }
+
+  .admin-booking-list__thead th,
+  .admin-booking-list__tbody td {
+    padding: 10px 10px;
+  }
+
+  .admin-booking-list__bookingNo,
+  .admin-booking-list__userName,
+  .admin-booking-list__totalAmount {
+    width: auto;
+  }
+}
+
+@media (max-width: 540px) {
+  .admin-booking-list {
+    padding: 20px 12px 28px;
+  }
+
+  .admin-booking-list__title {
+    font-size: 20px;
+  }
+
+  .admin-booking-list__bookingNo,
+  .admin-booking-list__totalAmount {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 820px) {
+  .admin-booking-list__filter select,
+  .admin-booking-list__filter input {
+    width: 100%;
+  }
+
+  .admin-booking-list__count {
+    width: 100%;
+    margin-left: 0;
+  }
+}
