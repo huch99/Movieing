@@ -14,6 +14,8 @@ import AdminScreenDetailPage from './pages/admin/screen_pages/AdminScreenDetailP
 import AdminTheaterList_SchedulePage from './pages/admin/schedule_pages/AdminTheaterList_SchedulePage';
 import AdminScheduleListPage from './pages/admin/schedule_pages/AdminScheduleListPage';
 import AdminScheduleDetailPage from './pages/admin/schedule_pages/AdminScheduleDetailPage';
+import AdminBookingListPage from './pages/admin/booking_pages/AdminBookingListPage';
+import AdminBookingDetailPage from './pages/admin/booking_pages/AdminBookingDetailPage';
 
 function decodeBase64Url(str) {
   const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -93,6 +95,9 @@ function App() {
           <Route path='/admin/schedules' element={<AdminTheaterList_SchedulePage />} />
           <Route path='/admin/schedules/:theaterId' element={<AdminScheduleListPage />} />
           <Route path='/admin/schedules/:scheduleId/detail' element={<AdminScheduleDetailPage />} />
+          {/* 예매 관리 페이지 */}
+          <Route path='/admin/bookings' element={<AdminBookingListPage />} />
+          <Route path='/admin/bookings/:bookingId/detail' element={<AdminBookingDetailPage />}/>
         </Route>
 
         {/* 404 */}
