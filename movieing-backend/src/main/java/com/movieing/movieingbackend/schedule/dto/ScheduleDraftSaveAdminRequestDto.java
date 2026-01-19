@@ -26,6 +26,7 @@ import java.time.LocalTime;
 @Builder
 public class ScheduleDraftSaveAdminRequestDto {
     private Long movieId;            // 영화 ID (임시 단계에서는 null 허용)
+    private Long screenId;
     private LocalDate scheduledDate; // 상영 날짜
     private LocalTime startAt;       // 상영 시작 시간
 }

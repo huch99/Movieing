@@ -7,6 +7,8 @@ import com.movieing.movieingbackend.schedule.dto.*;
 import com.movieing.movieingbackend.schedule.entity.Schedule;
 import com.movieing.movieingbackend.schedule.entity.ScheduleStatus;
 import com.movieing.movieingbackend.schedule.repository.ScheduleRepository;
+import com.movieing.movieingbackend.screen.entity.Screen;
+import com.movieing.movieingbackend.screen.repository.ScreenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +24,17 @@ public class AdminScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final MovieRepository movieRepository;
+    private final ScreenRepository screenRepository;
+
 
     /**
      * 스케줄 임시 저장 (DRAFT)
      */
     @Transactional
-    public Long saveDraft(ScheduleDraftSaveAdminRequestDto dto) {
+    public Long createDraft(ScheduleDraftSaveAdminRequestDto dto) {
         Movie movie = null;
+        Screen screen = null;
+
         if(dto.getMovieId() != null) {
             movie = movieRepository.findById(dto.getMovieId())
                     .orElseThrow(() -> new NotFoundException("영화를 찾을 수 없습니다."));
@@ -36,11 +42,27 @@ public class AdminScheduleService {
 
         Schedule schedule = Schedule.createDraft(
                 movie,
+                screen,
                 dto.getScheduledDate(),
                 dto.getStartAt()
         );
 
         return scheduleRepository.save(schedule).getScheduleId();
+    }
+
+    @Transactional
+    public void saveDraft(Long scheduleId, ScheduleDraftSaveAdminRequestDto dto) {
+        Schedule schedule = getSchedule(scheduleId);
+
+        schedule.update(
+                dto.getMovieId() != null ? movieRepository.findById(dto.getMovieId())
+                    .orElseThrow(() -> new NotFoundException("영화를 찾을 수 없습니다.")) : null,
+                dto.getScreenId() != null ? screenRepository.findById(dto.getScreenId())
+                        .orElseThrow(() -> new NotFoundException("상영관을 찾을 수 없습니다.")) : null,
+                dto.getScheduledDate(),
+                dto.getStartAt()
+        );
+
     }
 
     /**
@@ -53,8 +75,12 @@ public class AdminScheduleService {
         Movie movie = movieRepository.findById(dto.getMovieId())
                 .orElseThrow(() -> new NotFoundException("영화를 찾을 수 없습니다."));
 
+        Screen screen = screenRepository.findById(dto.getScreenId())
+                .orElseThrow(() -> new NotFoundException("상영관을 찾을 수 없습니다."));
+
         schedule.update(
                 movie,
+                screen,
                 dto.getScheduledDate(),
                 dto.getStartAt()
         );
@@ -71,8 +97,12 @@ public class AdminScheduleService {
         Movie movie = movieRepository.findById(dto.getMovieId())
                 .orElseThrow(() -> new NotFoundException("영화를 찾을 수 없습니다."));
 
+        Screen screen = screenRepository.findById(dto.getScreenId())
+                .orElseThrow(() -> new NotFoundException("상영관을 찾을 수 없습니다."));
+
         schedule.update(
                 movie,
+                screen,
                 dto.getScheduledDate(),
                 dto.getStartAt()
         );
@@ -87,6 +117,7 @@ public class AdminScheduleService {
         return ScheduleDetailAdminResponseDto.builder()
                 .scheduleId(schedule.getScheduleId())
                 .movieId(schedule.getMovie() != null ? schedule.getMovie().getMovieId() : null)
+                .screenId(schedule.getScreen() != null ? schedule.getScreen().getScreenId() : null)
                 .title(schedule.getMovie() != null ? schedule.getMovie().getTitle() : null)
                 .runtimeMin(schedule.getMovie() != null ? schedule.getMovie().getRuntimeMin() : null)
                 .scheduledDate(schedule.getScheduledDate())
@@ -104,6 +135,8 @@ public class AdminScheduleService {
                 .map(schedule -> ScheduleListItemAdminResponseDto.builder()
                         .scheduleId(schedule.getScheduleId())
                         .movieId(schedule.getMovie() != null ? schedule.getMovie().getMovieId() : null)
+                        .screenId(schedule.getScreen() != null ? schedule.getScreen().getScreenId() : null)
+                        .screenName(schedule.getScreen() != null ? schedule.getScreen().getScreenName() : null)
                         .title(schedule.getMovie() != null ? schedule.getMovie().getTitle() : null)
                         .runtimeMin(schedule.getMovie() != null ? schedule.getMovie().getRuntimeMin() : null)
                         .scheduledDate(schedule.getScheduledDate())

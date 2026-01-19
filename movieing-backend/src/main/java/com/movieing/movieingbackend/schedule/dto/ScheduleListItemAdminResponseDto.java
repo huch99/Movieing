@@ -25,6 +25,8 @@ public class ScheduleListItemAdminResponseDto {
     Long scheduleId;      // 스케줄 ID
 
     Long movieId;             // 영화 ID
+    Long screenId;
+    String screenName;
     String title;      // 영화 제목
     Integer runtimeMin;       // 상영 시간(분)
 

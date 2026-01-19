@@ -2,6 +2,7 @@ package com.movieing.movieingbackend.schedule.entity;
 
 import com.movieing.movieingbackend.aspect.BaseTimeEntity;
 import com.movieing.movieingbackend.movie.entity.Movie;
+import com.movieing.movieingbackend.screen.entity.Screen;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +42,10 @@ public class Schedule extends BaseTimeEntity {
     @JoinColumn(name = "movie_id", nullable = true)
     private Movie movie;                // 상영 영화 (임시 스케줄 단계에서는 null 가능)
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "screen_id", nullable = true)
+    private Screen screen;
+
     @Column(name = "scheduled_date", nullable = true)
     private LocalDate scheduledDate;    // 상영 날짜
 
@@ -64,11 +69,13 @@ public class Schedule extends BaseTimeEntity {
      */
     public static Schedule createDraft(
             Movie movie,
+            Screen screen,
             LocalDate scheduledDate,
             LocalTime startAt
     ) {
         Schedule schedule = Schedule.builder()
                 .movie(movie)
+                .screen(screen)
                 .scheduledDate(scheduledDate)
                 .startAt(startAt)
                 .status(ScheduleStatus.DRAFT)
@@ -97,14 +104,12 @@ public class Schedule extends BaseTimeEntity {
      */
     public void update(
             Movie movie,
+            Screen screen,
             LocalDate scheduledDate,
             LocalTime startAt
     ) {
-        if (this.status != ScheduleStatus.OPEN) {
-            throw new IllegalStateException("OPEN 상태의 스케줄만 수정할 수 있습니다.");
-        }
-
         this.movie = movie;
+        this.screen = screen;
         this.scheduledDate = scheduledDate;
         this.startAt = startAt;
         calculateEndAt();
@@ -121,7 +126,7 @@ public class Schedule extends BaseTimeEntity {
      * 스케줄 취소 처리 (CANCELLED)
      */
     public void cancel() {
-        this.status = ScheduleStatus.CANCELLED;
+        this.status = ScheduleStatus.CANCELED;
     }
 
     /**

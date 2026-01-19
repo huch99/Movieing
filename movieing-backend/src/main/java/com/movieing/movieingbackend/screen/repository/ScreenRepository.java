@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 상영관(Screen) 엔티티 Repository
  *
@@ -17,4 +19,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScreenRepository extends JpaRepository<Screen, Long> {
     Page<Screen> findByTheater_TheaterIdAndStatusNot(Long theaterId, ScreenStatus status, Pageable pageable);
+
+    List<Screen> findByTheater_TheaterIdAndStatusIn(Long theaterId, List<ScreenStatus> statuses);
 }

@@ -26,6 +26,9 @@ public class ScheduleUpdateAdminRequestDto {
     @NotNull(message = "영화 선택은 필수입니다.")
     private Long movieId;            // 영화 ID
 
+    @NotNull(message = "상영관 선택은 필수입니다.")
+    private Long screenId;
+
     @NotNull(message = "상영 날짜는 필수입니다.")
     private LocalDate scheduledDate; // 상영 날짜
 

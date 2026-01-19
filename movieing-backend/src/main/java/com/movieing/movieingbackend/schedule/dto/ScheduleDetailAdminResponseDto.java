@@ -26,6 +26,7 @@ public class ScheduleDetailAdminResponseDto {
     private Long scheduleId;          // 스케줄 ID
 
     private Long movieId;             // 영화 ID
+    private Long screenId;
     private String title;        // 영화 제목
     private Integer runtimeMin;       // 상영 시간(분)
 

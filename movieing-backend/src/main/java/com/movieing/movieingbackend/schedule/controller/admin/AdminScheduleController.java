@@ -5,7 +5,11 @@ import com.movieing.movieingbackend.movie.entity.MovieStatus;
 import com.movieing.movieingbackend.movie.service.admin.AdminMovieService;
 import com.movieing.movieingbackend.schedule.dto.*;
 import com.movieing.movieingbackend.schedule.service.admin.AdminScheduleService;
+import com.movieing.movieingbackend.screen.dto.admin.ScreenListItemAdminResponseDto;
+import com.movieing.movieingbackend.screen.entity.ScreenStatus;
+import com.movieing.movieingbackend.screen.service.admin.AdminScreenService;
 import com.movieing.movieingbackend.theater.dto.admin.TheaterListItemAdminResponseDto;
+import com.movieing.movieingbackend.theater.entity.Theater;
 import com.movieing.movieingbackend.theater.entity.TheaterStatus;
 import com.movieing.movieingbackend.theater.service.admin.AdminTheaterService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +29,8 @@ public class AdminScheduleController {
 
     private final AdminScheduleService adminScheduleService;
     private final AdminTheaterService adminTheaterService;
-    private final AdminMovieService adminMovieService;;
+    private final AdminMovieService adminMovieService;
+    private final AdminScreenService adminScreenService;
 
     /**
      * 영화관 목록 조회 (ACTIVE, HIDDEN)
@@ -34,6 +39,19 @@ public class AdminScheduleController {
     public List<TheaterListItemAdminResponseDto> getTheaters() {
         return adminTheaterService.getListByStatuses(
                 List.of(TheaterStatus.ACTIVE, TheaterStatus.HIDDEN)
+        );
+    }
+
+    /**
+     * 상영관 목록 조회 (ACTIVE)
+     *
+     * */
+    @GetMapping("/{theaterId}/screens")
+    public List<ScreenListItemAdminResponseDto> getScreens(@PathVariable Long theaterId) {
+
+        return adminScreenService.getListByStatus(
+                theaterId,
+                List.of(ScreenStatus.ACTIVE)
         );
     }
 
@@ -61,10 +79,19 @@ public class AdminScheduleController {
     /**
      * 스케줄 임시 저장 (DRAFT)
      */
-    @PostMapping("/draft")
-    public Long saveDraft(@RequestBody ScheduleDraftSaveAdminRequestDto dto) {
-        return adminScheduleService.saveDraft(dto);
+    @PostMapping
+    public Long createDraft(@RequestBody ScheduleDraftSaveAdminRequestDto dto) {
+        return adminScheduleService.createDraft(dto);
     }
+
+    @PutMapping("/{scheduleId}/draft")
+    public void saveDraft(
+            @PathVariable Long scheduleId,
+            @RequestBody ScheduleDraftSaveAdminRequestDto dto
+    ) {
+        adminScheduleService.saveDraft(scheduleId, dto);
+    }
+
 
     /**
      * 스케줄 등록 완료 (OPEN)

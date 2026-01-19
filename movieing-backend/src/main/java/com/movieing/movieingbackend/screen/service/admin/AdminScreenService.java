@@ -26,6 +26,19 @@ public class AdminScreenService {
     private final TheaterRepository theaterRepository;
 
     /**
+     * 상태 조건으로 상영관 목록 조회
+     *
+     * */
+    public List<ScreenListItemAdminResponseDto> getListByStatus(Long theaterId, List<ScreenStatus> statuses) {
+        Theater theater = getTheaterEntity(theaterId);
+
+        return screenRepository.findByTheater_TheaterIdAndStatusIn(theater.getTheaterId(), statuses)
+                .stream()
+                .map(this::toListItemDto)
+                .toList();
+    }
+
+    /**
      * 상영관 목록 조회 (관리자)
      * - DELETED 제외 목록 조회
      */
