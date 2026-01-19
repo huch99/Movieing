@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BookingSeatRepository extends JpaRepository<BookingSeat, Long> {
 
@@ -22,4 +24,6 @@ public interface BookingSeatRepository extends JpaRepository<BookingSeat, Long> 
     boolean existsByScreenId(@Param("screenId") Long screenId);
 
     boolean existsBySeat_SeatId(Long seatId);
+
+    Optional<BookingSeat> findByBooking_BookingId(Long bookingId);
 }
