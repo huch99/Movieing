@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './AdminScheduleDetailPage.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { adminScheduleApi } from './adminScheduleApi';
 
 const ALLOWED_MOVIE_STATUS = new Set(["COMMING_SOON", "NOW_SHOWING"]);
+const ALLOWED_SCREEN_STATUS = new Set(["ACTIVE"]);
 
 const AdminScheduleDetailPage = () => {
     const navigate = useNavigate();
     const { scheduleId } = useParams();
+    const [ searchParams ] = useSearchParams();
+    const theaterId = searchParams.get("theaterId");
 
     const [loading, setLoading] = useState();
     const [saving, setSaving] = useState(false);
@@ -16,10 +19,14 @@ const AdminScheduleDetailPage = () => {
     const [moviesLoading, setMoviesLoading] = useState(false);
     const [movies, setMovies] = useState([]);
 
+    const [screensLoading, setScreensLoading] = useState(false);
+    const [screens, setScreens] = useState([]);
+
     const [form, setForm] = useState({
         movieId: "",
         scheduledDate: "",
         startAt: "",
+        screenId: "",
     });
 
     const movieOptions = useMemo(() => {
@@ -31,6 +38,16 @@ const AdminScheduleDetailPage = () => {
                 status: m.status,
             }));
     }, [movies]);
+
+    const screenOptions = useMemo(() => {
+        return (screens || [])
+            .filter((s) => ALLOWED_SCREEN_STATUS.has(String(s.status)))
+            .map((s) => ({
+                screenId: s.screenId,
+                screenName: s.screenName,
+                status: s.status,
+            }))
+    })
 
     const loadMovies = async () => {
         setMoviesLoading(true);
@@ -47,6 +64,21 @@ const AdminScheduleDetailPage = () => {
         }
     };
 
+    const loadScreens = async () => {
+        setScreensLoading(true);
+        try {
+            const arr = await adminScheduleApi.getScreens(theaterId, {
+                statuses: "ACTIVE",
+            });
+            setScreens(arr);
+        } catch (e) {
+            console.error(e);
+            alert("상영관 목록 조회에 실패 했습니다.");
+        } finally {
+            setScreensLoading(false);
+        }
+    };
+
     const load = async () => {
         setLoading(true);
         try {
@@ -54,6 +86,7 @@ const AdminScheduleDetailPage = () => {
             setData(d);
             setForm({
                 movieId: d?.movieId ?? "",
+                screenId: d?.screenId ?? "",
                 scheduledDate: d?.scheduledDate ?? "",
                 startAt: d?.startAt ?? "",
             });
@@ -68,6 +101,7 @@ const AdminScheduleDetailPage = () => {
     useEffect(() => {
         load();
         loadMovies();
+        loadScreens();
     }, [scheduleId]);
 
     const onChange = (k) => (e) => {
@@ -82,6 +116,7 @@ const AdminScheduleDetailPage = () => {
     // ✅ 공통 payload
     const buildBody = () => ({
         movieId: Number(form.movieId),
+        screenId: Number(form.screenId),
         scheduledDate: form.scheduledDate,
         startAt: form.startAt,
     });
@@ -214,8 +249,21 @@ const AdminScheduleDetailPage = () => {
                             </div>
 
                             <div className="field">
+                                <label>상영관 선택</label>
+                                <select value={form.screenId} onChange={onChange("screenId")}>
+                                    <option value="">선택</option>
+                                    {screenOptions.map((s) => (
+                                        <option key={s.screenId} value={s.screenId}>
+                                            {s.screenName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="field">
                                 <label>상영 날짜</label>
                                 <input
+                                    type='date'
                                     value={form.scheduledDate}
                                     onChange={onChange("scheduledDate")}
                                     placeholder="YYYY-MM-DD"
@@ -225,6 +273,7 @@ const AdminScheduleDetailPage = () => {
                             <div className="field">
                                 <label>상영 시작 시간</label>
                                 <input
+                                type='time'
                                     value={form.startAt}
                                     onChange={onChange("startAt")}
                                     placeholder="HH:mm:ss"
@@ -233,12 +282,7 @@ const AdminScheduleDetailPage = () => {
 
                             <div className="field">
                                 <label>상영 종료 시간 (auto)</label>
-                                <input value={data.endAt ?? ""} disabled />
-                            </div>
-
-                            <div className="field">
-                                <label>영화 제목 (auto)</label>
-                                <input value={data.title ?? ""} disabled />
+                                <input type='time' value={data.endAt ?? ""} disabled />
                             </div>
 
                             <div className="field">

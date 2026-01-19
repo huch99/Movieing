@@ -141,7 +141,7 @@ const AdminMovieListPage = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                items.map((m) => (
+                                filtered.map((m) => (
                                     <tr
                                         key={m.movieId}
                                         className="admin-movie-list__row"

@@ -5,11 +5,11 @@ import { adminTheaterApi } from "./adminTheaterApi";
 
 const STATUS_OPTIONS = [
   { value: "ALL", label: "전체" },
-  { value: "DRAFT", label: "DRAFT" },
-  { value: "ACTIVE", label: "ACTIVE" },
-  { value: "HIDDEN", label: "HIDDEN" },
-  { value: "CLOSED", label: "CLOSED" },
-  { value: "DELETED", label: "DELETED" },
+  { value: "DRAFT", label: "임시 저장" },
+  { value: "ACTIVE", label: "활성화" },
+  { value: "HIDDEN", label: "숨김" },
+  { value: "CLOSED", label: "운영 종료" },
+  { value: "DELETED", label: "삭제됨" },
 ];
 
 const fmtDateTime = (v) => {

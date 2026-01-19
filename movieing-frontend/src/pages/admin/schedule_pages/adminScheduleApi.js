@@ -15,6 +15,12 @@ export const adminScheduleApi = {
         return res.data;
     },
 
+    // 상영관 목록
+    getScreens: async (theaterId, params) => {
+        const res = await api.get(`${BASE}/${theaterId}/screens`, {params});
+        return res.data;
+    },
+
     // 스케줄 목록 (Page)
     getList: async (params) => {
         // params 예: { page: 0, size: 10, sort: "scheduleId,desc" }
@@ -29,10 +35,15 @@ export const adminScheduleApi = {
     },
 
     // 스케줄 임시 저장 (DRAFT)
-    saveDraft: async (body) => {
+    createDraft: async (body) => {
         // body: { movieId?, scheduledDate?, startAt? }
-        const res = await api.post(`${BASE}/draft`, body);
+        const res = await api.post(BASE, body);
         return res.data; // scheduleId (Long)
+    },
+
+    saveDraft: async (scheduleId, body) => {
+        const res = await api.put(`${BASE}/${scheduleId}/draft`, body);
+        return res.data;
     },
 
     // 스케줄 완료 (OPEN)

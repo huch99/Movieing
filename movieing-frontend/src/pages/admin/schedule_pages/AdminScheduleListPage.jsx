@@ -3,13 +3,14 @@ import './AdminScheduleListPage.css';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { adminScheduleApi } from './adminScheduleApi';
 
-const STATUS_LABEL = {
-  DRAFT: "DRAFT",
-  OPEN: "OPEN",
-  CLOSED: "CLOSED",
-  CANCELLED: "CANCELLED",
-  DELETED: "DELETED",
-};
+const STATUS_LABEL = [
+  { value : "ALL", label : "전체" },
+  { value : "DRAFT", label : "임시 저장" },
+  { value : "OPEN", label : "오픈"},
+  { value : "CLOSED", label : "마감"},
+  { value : "CANCELED", label : "최소"},
+  { value : "DELETED", label : "삭제됨"},
+];
 
 const AdminScheduleListPage = () => {
   const navigate = useNavigate();
@@ -18,14 +19,36 @@ const AdminScheduleListPage = () => {
   const theaterName = searchParams.get("theaterName");
 
   const [loading, setLoading] = useState(false);
-  const [pageData, setPageData] = useState(null);
+  const [pageData, setPageData] = useState([]);
 
-  const [status, setStatus] = useState("");
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState("ALL");
 
   const [page, setPage] = useState(0);
   const size = 10;
 
   const content = useMemo(() => pageData?.content ?? [], [pageData]);
+
+  const filtered = useMemo(() => {
+    const keyword = q.trim().toLowerCase();
+    return (content || [])
+      .filter((it) => {
+        if(status === "ALL") return true;
+        return String(it.status) === status;
+      })
+      .filter((it) => {
+        if(!keyword) return true;
+        const hay = [
+          it.screenName,
+          it.title,
+          it.scheduledDate,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        return hay.includes(keyword);
+      })
+  }, [content, q, status]);
 
   const load = async (nextPage = page, nextStatus = status) => {
     setLoading(true);
@@ -50,13 +73,6 @@ const AdminScheduleListPage = () => {
     load(0, status);
   }, [theaterId]);
 
-  const onChangeStatus = (e) => {
-    const v = e.target.value;
-    setStatus(v);
-    setPage(0);
-    load(0, v);
-  };
-
   const goPrev = () => {
     const next = Math.max(0, page - 1);
     setPage(next);
@@ -72,7 +88,7 @@ const AdminScheduleListPage = () => {
 
   const goCreate = async () => {
     try {
-      const scheduleId = await adminScheduleApi.saveDraft({
+      const scheduleId = await adminScheduleApi.createDraft({
         // 최소 정보만 (또는 빈 객체)
         movieId: null,
         scheduledDate: null,
@@ -87,7 +103,7 @@ const AdminScheduleListPage = () => {
   };
 
   const goScheduleDetail = (scheduleId) => {
-    navigate(`/admin/schedules/${scheduleId}/detail`);
+    navigate(`/admin/schedules/${scheduleId}/detail?theaterId=${theaterId}`);
   };
 
   return (
@@ -115,13 +131,22 @@ const AdminScheduleListPage = () => {
       <div className="admin-theater-list__filters">
         <div className="admin-theater-list__filter">
           <label>상태</label>
-          <select value={status} onChange={onChangeStatus}>
-            <option value="">전체</option>
-            <option value="DRAFT">DRAFT</option>
-            <option value="OPEN">OPEN</option>
-            <option value="CLOSED">CLOSED</option>
-            <option value="CANCELLED">CANCELLED</option>
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            {STATUS_LABEL.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
           </select>
+        </div>
+
+        <div className="admin-theater-list__filter admin-theater-list__filter--grow">
+          <label>검색</label>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="영화명 / 상영관"
+          />
         </div>
 
         <div className="admin-theater-list__count">
@@ -134,7 +159,7 @@ const AdminScheduleListPage = () => {
         <table className="admin-theater-list__table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>상영관</th>
               <th>영화</th>
               <th>날짜</th>
               <th>시간</th>
@@ -160,13 +185,13 @@ const AdminScheduleListPage = () => {
             )}
 
             {!loading &&
-              content.map((s) => (
+              filtered.map((s) => (
                 <tr
                   key={s.scheduleId}
                   onClick={() => goScheduleDetail(s.scheduleId)}
                   style={{ cursor: "pointer" }}
                 >
-                  <td>{s.scheduleId}</td>
+                  <td>{s.screenName}</td>
                   <td>
                     <strong>{s.title ?? "-"}</strong>
                     <div style={{ fontSize: 12, opacity: 0.7 }}>
