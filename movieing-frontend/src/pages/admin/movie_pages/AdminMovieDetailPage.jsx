@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { adminMovieApi } from './adminMovieApi';
 
 const AdminMovieDetailPage = () => {
-    const nav = useNavigate();
+    const navigate = useNavigate();
     const { movieId } = useParams();
     const id = useMemo(() => Number(movieId), [movieId]);
 
@@ -45,7 +45,7 @@ const AdminMovieDetailPage = () => {
             });
         } catch (e) {
             alert(e?.response?.data?.resultMessage ?? e?.message ?? "상세 조회 실패");
-            nav("/admin/movies", { replace: true });
+            navigate("/admin/movies", { replace: true });
         } finally {
             setLoading(false);
         }
@@ -54,11 +54,10 @@ const AdminMovieDetailPage = () => {
     useEffect(() => {
         if (!movieId) return;
         if (!Number.isFinite(id) || id <= 0) {
-            nav("/admin/movies", { replace: true });
+            navigate("/admin/movies", { replace: true });
             return;
         }
         load();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, movieId]);
 
     const onChange = (k, v) => {
@@ -135,7 +134,7 @@ const AdminMovieDetailPage = () => {
         try {
             await adminMovieApi.remove(id);
             alert("삭제 완료");
-            nav("/admin/movies", { replace: true });
+            navigate("/admin/movies", { replace: true });
         } catch (e) {
             alert(e?.response?.data?.resultMessage ?? e?.message ?? "삭제 실패");
         }
@@ -167,7 +166,7 @@ const AdminMovieDetailPage = () => {
 
                     <button
                         className="admin-movie-detail__back-btn"
-                        onClick={() => nav("/admin/movies")}
+                        onClick={() => navigate("/admin/movies")}
                         type="button"
                     >
                         목록

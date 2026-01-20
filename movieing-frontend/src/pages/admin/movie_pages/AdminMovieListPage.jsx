@@ -14,7 +14,8 @@ const STATUS_OPTIONS = [
 ];
 
 const AdminMovieListPage = () => {
-    const nav = useNavigate();
+    const navigate = useNavigate();
+    
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -64,7 +65,7 @@ const AdminMovieListPage = () => {
     const onCreateDraft = async () => {
         try {
             const movieId = await adminMovieApi.createDraft();
-            nav(`/admin/movies/${movieId}`);
+            navigate(`/admin/movies/${movieId}`);
         } catch (e) {
             alert(e?.response?.data?.resultMessage ?? e?.message ?? "초안 생성 실패");
         }
@@ -89,6 +90,32 @@ const AdminMovieListPage = () => {
                             영화(초안) 등록
                         </button>
                     </div>
+                </div>
+
+                <div className="admin-movie-list__stats">
+                    <div className="admin-movie-list__stats-table-wrap">
+                        <table className="admin-movie-list__stats-table">
+                            <thead className="admin-movie-list__stats-thead">
+                                <tr>
+                                    <th>등록된 영화</th>
+                                    <th>상영중인 영화</th>
+                                    <th>작성중인 영화</th>
+                                    <th>상영 종료 영화</th>
+                                    <th>숨김 처리된 영화</th>
+                                </tr>
+                            </thead>
+
+                            <tbody className="admin-movie-list__stats-tbody">
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>                    
                 </div>
 
                  {/* ===== Filters ===== */}
@@ -145,7 +172,7 @@ const AdminMovieListPage = () => {
                                     <tr
                                         key={m.movieId}
                                         className="admin-movie-list__row"
-                                        onClick={() => nav(`/admin/movies/${m.movieId}`)}
+                                        onClick={() => navigate(`/admin/movies/${m.movieId}`)}
                                     >
                                         <td className="admin-movie-list__id">{m.movieId}</td>
 
