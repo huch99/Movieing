@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { adminBookingApi } from './adminBookingAPi';
 import './AdminBookingListPage.css';
 
-
+// 상태 필터 정의
 const STATUS_OPTIONS = [
     { value: "ALL", label: "전체" },
     { value: "FENDING", label: "대기" },
@@ -14,17 +14,24 @@ const STATUS_OPTIONS = [
 ]
 
 const AdminBookingListPage = () => {
+    // 네비게이션 기능 호출
     const navigate = useNavigate();
 
+    // 페이징 처리를 위한 params 선언
     const [page, setPage] = useState(0);
     const size = 20;
 
+    // booking 상태 선언
     const [bookings, setBookings] = useState([]);
     const [bookingLoading, setBookingLoading] = useState(false);
 
+    // 검색 기능을 위한 상태 선언 (백엔드 처리로 바꿀 것.)
     const [q, setQ] = useState("");
+
+    // 필터링 기능을 위한 상태 선언
     const [status, setStatus] = useState("ALL")
 
+    // booking 전체 리스트 가져오는 함수
     const load = async (nextPage = page, nextStatus = status) => {
         setBookingLoading(true);
 
@@ -45,11 +52,13 @@ const AdminBookingListPage = () => {
         }
     }
 
+    // 페이지 렌더링 시 load함수 실행
     useEffect(() => {
         setPage(0);
         load(0, status);
     }, []);
 
+    // 검색 필터 (백엔드 처리 할 것)
     const filtered = useMemo(() => {
         const keyword = q.trim().toLowerCase();
 
@@ -71,6 +80,7 @@ const AdminBookingListPage = () => {
             })
     }, [bookings, status, q])
 
+    // booking 취소 함수
     const onCancel = async (bookingId) => {
         if (!window.confirm("취소 시 복구 할 수 없습니다. 취소 하시겠습니까?")) return;
         try {
@@ -81,12 +91,14 @@ const AdminBookingListPage = () => {
         }
     }
 
+    // 페이징 기능 - 이전 페이지
     const goPrev = () => {
         const next = Math.max(0, page - 1);
         setPage(next);
         load(next);
     }
 
+    // 페이징 기능 - 다음 페이지
     const goNext = () => {
         const totalPages = pageData?.totalPages ?? 0;
         const next = Math.min(totalPages - 1, page + 1);
@@ -164,7 +176,10 @@ const AdminBookingListPage = () => {
                                     <td className='admin-booking-list__title'>{m.title}</td>
                                     <td className='admin-booking-list__userName'>{m.userName}</td>
                                     <td className='admin-booking-list__totalAmount'>{m.totalAmount}원</td>
-                                    <td><button className="admin-booking-list__cancelBtn" onClick={onCancel(m.bookingId)}>취소</button></td>
+                                    <td><button className="admin-booking-list__cancelBtn" onClick={() => {
+                                        e.stopPropagation();
+                                        onCancel(m.bookingId);
+                                    }}>취소</button></td>
                                 </tr>
                             )))}
                     </tbody>
