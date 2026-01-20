@@ -16,6 +16,8 @@ import AdminScheduleListPage from './pages/admin/schedule_pages/AdminScheduleLis
 import AdminScheduleDetailPage from './pages/admin/schedule_pages/AdminScheduleDetailPage';
 import AdminBookingListPage from './pages/admin/booking_pages/AdminBookingListPage';
 import AdminBookingDetailPage from './pages/admin/booking_pages/AdminBookingDetailPage';
+import AdminPaymentListPage from './pages/admin/payment_pages/AdminPaymentListPage';
+import AdminPaymentDetailPage from './pages/admin/payment_pages/AdminPaymentDetailPage';
 
 function decodeBase64Url(str) {
   const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -98,6 +100,9 @@ function App() {
           {/* 예매 관리 페이지 */}
           <Route path='/admin/bookings' element={<AdminBookingListPage />} />
           <Route path='/admin/bookings/:bookingId/detail' element={<AdminBookingDetailPage />}/>
+          {/* 결제 관리 페이지 */}
+          <Route path='/admin/payments' element={<AdminPaymentListPage />} />
+          <Route path='/admin/payments/:paymentId/detail' element={<AdminPaymentDetailPage />} />
         </Route>
 
         {/* 404 */}
