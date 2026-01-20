@@ -1,0 +1,406 @@
+/* AdminPaymentListPage.css */
+
+/* ===== Theme tokens (same as 예시) ===== */
+:root {
+  --bg: #0b0f1a;
+  --bg2: #0f172a;
+  --card: rgba(17, 24, 39, 0.72);
+  --card2: rgba(2, 6, 23, 0.35);
+  --border: rgba(148, 163, 184, 0.14);
+  --border2: rgba(148, 163, 184, 0.18);
+  --text: #e5e7eb;
+  --muted: rgba(229, 231, 235, 0.62);
+  --muted2: rgba(229, 231, 235, 0.42);
+
+  --accent: #7c3aed; /* violet */
+  --accent2: #a78bfa;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #22c55e;
+  --info: #38bdf8;
+
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --radius: 18px;
+}
+
+/* ===== Page layout ===== */
+.admin-payment-list {
+  min-height: calc(100vh - 120px);
+  padding: 28px 18px 36px;
+  background:
+    radial-gradient(900px 450px at 15% 10%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(700px 420px at 85% 15%, rgba(56, 189, 248, 0.12), transparent 55%),
+    radial-gradient(900px 520px at 50% 110%, rgba(16, 185, 129, 0.08), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  color: var(--text);
+}
+
+.admin-payment-list__card {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 20px 20px 14px;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== Header ===== */
+.admin-payment-list__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 6px 14px;
+}
+
+.admin-payment-list__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-payment-list__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* (옵션) 서브타이틀 쓰면 적용됨 */
+.admin-payment-list__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* ===== Table wrap ===== */
+.admin-payment-list__table-wrap {
+  width: min(1120px, 100%);
+  margin: 10px auto 0;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.40), rgba(2, 6, 23, 0.20));
+  overflow: hidden;
+}
+
+.admin-payment-list__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-payment-list__thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(229, 231, 235, 0.78);
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.52);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-payment-list__tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(229, 231, 235, 0.88);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  background: rgba(2, 6, 23, 0.10);
+  vertical-align: middle;
+}
+
+/* zebra + hover */
+.admin-payment-list__tbody tr:nth-child(even) td {
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.admin-payment-list-row {
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.admin-payment-list-row:hover td {
+  background: rgba(124, 58, 237, 0.10);
+}
+
+.admin-payment-list-row:active td {
+  background: rgba(124, 58, 237, 0.14);
+}
+
+/* ===== Column tweaks ===== */
+.admin-payment-list__publicPaymentId {
+  width: 130px;
+  color: rgba(229, 231, 235, 0.76);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-payment-list__bookingNo {
+  width: 120px;
+  color: rgba(229, 231, 235, 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-payment-list__userName {
+  width: 140px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.admin-payment-list__amount {
+  width: 140px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.admin-payment-list__approvedAt {
+  width: 190px;
+  color: rgba(229, 231, 235, 0.70);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.admin-payment-list__status {
+  width: 160px;
+}
+
+/* Empty row */
+.admin-payment-list__empty {
+  text-align: center;
+  padding: 22px 14px !important;
+  color: rgba(229, 231, 235, 0.60);
+}
+
+/* ===== Status badge (td 안에서 span 쓰면 제일 예쁨) =====
+   지금은 m.status를 그대로 td에 찍고 있어서,
+   추후 <span className={`admin-payment-list__badge admin-payment-list__badge--${m.status}`}> 형태로 쓰면 아래가 적용됨.
+*/
+.admin-payment-list__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: rgba(15, 23, 42, 0.45);
+  color: rgba(229, 231, 235, 0.84);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+.admin-payment-list__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.9);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14);
+}
+
+/* ===== Status mapping (포괄적으로) ===== */
+
+/* 대기/임시/요청 */
+.admin-payment-list__badge--READY,
+.admin-payment-list__badge--PENDING,
+.admin-payment-list__badge--REQUESTED,
+.admin-payment-list__badge--WAITING {
+  border-color: rgba(245, 158, 11, 0.30);
+  background: rgba(245, 158, 11, 0.10);
+}
+.admin-payment-list__badge--READY .admin-payment-list__dot,
+.admin-payment-list__badge--PENDING .admin-payment-list__dot,
+.admin-payment-list__badge--REQUESTED .admin-payment-list__dot,
+.admin-payment-list__badge--WAITING .admin-payment-list__dot {
+  background: var(--warn);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16);
+}
+
+/* 결제 성공 */
+.admin-payment-list__badge--PAID,
+.admin-payment-list__badge--APPROVED,
+.admin-payment-list__badge--SUCCESS,
+.admin-payment-list__badge--COMPLETED {
+  border-color: rgba(34, 197, 94, 0.28);
+  background: rgba(34, 197, 94, 0.10);
+}
+.admin-payment-list__badge--PAID .admin-payment-list__dot,
+.admin-payment-list__badge--APPROVED .admin-payment-list__dot,
+.admin-payment-list__badge--SUCCESS .admin-payment-list__dot,
+.admin-payment-list__badge--COMPLETED .admin-payment-list__dot {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+/* 환불/취소/실패 */
+.admin-payment-list__badge--REFUNDED,
+.admin-payment-list__badge--CANCELED,
+.admin-payment-list__badge--CANCELLED,
+.admin-payment-list__badge--FAILED,
+.admin-payment-list__badge--VOID {
+  border-color: rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.10);
+}
+.admin-payment-list__badge--REFUNDED .admin-payment-list__dot,
+.admin-payment-list__badge--CANCELED .admin-payment-list__dot,
+.admin-payment-list__badge--CANCELLED .admin-payment-list__dot,
+.admin-payment-list__badge--FAILED .admin-payment-list__dot,
+.admin-payment-list__badge--VOID .admin-payment-list__dot {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+/* ===== Refund button ===== */
+.admin-payment-list__cancelBtn {
+  appearance: none;
+  border: 1px solid rgba(239, 68, 68, 0.26);
+  background:
+    linear-gradient(180deg, rgba(239, 68, 68, 0.92), rgba(239, 68, 68, 0.70));
+  color: white;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, border-color 140ms ease;
+  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.18);
+  white-space: nowrap;
+}
+
+.admin-payment-list__cancelBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  border-color: rgba(239, 68, 68, 0.42);
+  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.26);
+}
+
+.admin-payment-list__cancelBtn:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+.admin-payment-list__cancelBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.30),
+    0 14px 28px rgba(239, 68, 68, 0.26);
+}
+
+.admin-payment-list__cancelBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
+/* ✅ 행 클릭과 버튼 클릭 충돌 방지용(버튼 클릭 시 hover 밀림 방지) */
+.admin-payment-list__tbody td:last-child {
+  width: 110px;
+}
+.admin-payment-list__tbody td:last-child,
+.admin-payment-list__tbody td:last-child * {
+  pointer-events: auto;
+}
+
+/* ===== Pager ===== */
+.pager {
+  width: min(1120px, 100%);
+  margin: 14px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(2, 6, 23, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.pager button {
+  appearance: none;
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  background: rgba(124, 58, 237, 0.16);
+  color: rgba(229, 231, 235, 0.92);
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, filter 140ms ease;
+}
+
+.pager button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(167, 139, 250, 0.40);
+  box-shadow: 0 12px 26px rgba(124, 58, 237, 0.18);
+  filter: brightness(1.04);
+}
+
+.pager button:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+.pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+}
+
+.pager button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.22),
+    0 12px 26px rgba(124, 58, 237, 0.18);
+}
+
+.pager__info {
+  min-width: 120px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229, 231, 235, 0.70);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .admin-payment-list__card {
+    padding: 16px 14px 12px;
+  }
+
+  .admin-payment-list__top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-payment-list__thead th,
+  .admin-payment-list__tbody td {
+    padding: 10px 10px;
+  }
+
+  .admin-payment-list__approvedAt {
+    width: auto;
+  }
+}
+
+@media (max-width: 540px) {
+  .admin-payment-list {
+    padding: 20px 12px 28px;
+  }
+
+  .admin-payment-list__title {
+    font-size: 20px;
+  }
+
+  .admin-payment-list__publicPaymentId,
+  .admin-payment-list__bookingNo,
+  .admin-payment-list__approvedAt {
+    white-space: nowrap;
+  }
+}
