@@ -20,24 +20,6 @@ const fmtDateTime = (v) => {
   return d.toLocaleString();
 };
 
-const badgeStyle = (status) => {
-  // 색 지정은 안 하고 className으로만 처리(원하면 css 붙이면 됨)
-  switch (status) {
-    case "DRAFT":
-      return { opacity: 0.9 };
-    case "ACTIVE":
-      return { fontWeight: 700 };
-    case "HIDDEN":
-      return { opacity: 0.85 };
-    case "CLOSED":
-      return { opacity: 0.8 };
-    case "DELETED":
-      return { opacity: 0.7, textDecoration: "line-through" };
-    default:
-      return {};
-  }
-};
-
 const AdminTheaterListPage = () => {
   const navigate = useNavigate();
 
