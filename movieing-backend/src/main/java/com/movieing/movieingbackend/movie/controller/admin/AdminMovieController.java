@@ -2,6 +2,7 @@ package com.movieing.movieingbackend.movie.controller.admin;
 
 import com.movieing.movieingbackend.aspect.ApiResponse;
 import com.movieing.movieingbackend.movie.dto.admin.*;
+import com.movieing.movieingbackend.movie.entity.MovieStatus;
 import com.movieing.movieingbackend.movie.service.admin.AdminMovieService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -116,8 +117,11 @@ public class AdminMovieController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<Page<MovieListItemAdminResponseDto>>> getList(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(adminMovieService.getList(pageable)));
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) MovieStatus status,
+            @RequestParam(required = false) String keywords
+            ) {
+        return ResponseEntity.ok(ApiResponse.success(adminMovieService.getList(pageable, status, keywords)));
     }
 
     /**
@@ -128,6 +132,9 @@ public class AdminMovieController {
         return ResponseEntity.ok(ApiResponse.success(adminMovieService.getDetail(movieId)));
     }
 
+    /**
+     * 어드민 영화 통계
+     * */
     @GetMapping("/stats")
     public ResponseEntity<ApiResponse<MovieStatsAdminResponseDto>> getStats() {
         MovieStatsAdminResponseDto stats = adminMovieService.getStats();

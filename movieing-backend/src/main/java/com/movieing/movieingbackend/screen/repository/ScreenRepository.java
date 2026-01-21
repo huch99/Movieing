@@ -5,6 +5,8 @@ import com.movieing.movieingbackend.screen.entity.ScreenStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +23,50 @@ public interface ScreenRepository extends JpaRepository<Screen, Long> {
     Page<Screen> findByTheater_TheaterIdAndStatusNot(Long theaterId, ScreenStatus status, Pageable pageable);
 
     List<Screen> findByTheater_TheaterIdAndStatusIn(Long theaterId, List<ScreenStatus> statuses);
+
+    Long countByStatusNot(ScreenStatus status);
+
+    Long countByStatus(ScreenStatus status);
+
+    @Query("""
+        select s
+        from Screen s
+        where s.theater.theaterId = :theaterId
+            and s.status <> :deleted
+            and (
+                :keywords is null
+                or :keywords = ''
+                or lower(s.screenName) like concat('%', lower(:keywords), '%')
+                or (:id is not null and s.screenId = :id)
+            )
+    """)
+    Page<Screen> searchNotDeleted(
+            @Param("theaterId") Long theaterId,
+            @Param("deleted") ScreenStatus deleted,
+            @Param("keywords") String keywords,
+            @Param("id") Long id,
+            Pageable pageable
+    );
+
+    @Query("""
+        select s
+        from Screen s
+        where s.theater.theaterId = :theaterId
+            and s.status = :status
+            and (
+                :keywords is null
+                or :keywords = ''
+                or lower(s.screenName) like concat('%', lower(:keywords), '%')
+                or (:id is not null and s.screenId = :id)
+                )
+    """)
+    Page<Screen> searchByStatus(
+            @Param("theaterId") Long theaterId,
+            @Param("status") ScreenStatus status,
+            @Param("keywords") String keywords,
+            @Param("id") Long id,
+            Pageable pageable
+    );
+
+    Page<Screen> findByTheater_TheaterIdAndStatus(Long theaterId, ScreenStatus status, Pageable pageable);
 }

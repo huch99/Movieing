@@ -40,7 +40,8 @@ public class MovieStatusScheduler {
      *   COMMING_SOON 상태의 영화를 NOW_SHOWING 상태로 전환
      */
     @Transactional
-    @Scheduled(cron = "0 10 0 * * *")
+//    @Scheduled(cron = "0 10 0 * * *")
+    @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = Long.MAX_VALUE)
     public void startShowingReleasedMovies() {
 
         LocalDate today = LocalDate.now();

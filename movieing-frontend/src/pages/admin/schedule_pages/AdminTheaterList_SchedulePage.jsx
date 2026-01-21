@@ -5,41 +5,39 @@ import { adminScheduleApi } from './adminScheduleApi';
 
 const STATUS_OPTIONS = [
   { value: "ALL", label: "전체" },
-  { value: "DRAFT", label: "임시 저장"},
+  { value: "DRAFT", label: "임시 저장" },
   { value: "ACTIVE", label: "활성화" },
   { value: "HIDDEN", label: "숨김" },
-  { value : "CLOSED", label: "운영 종료"},
-  { value: "DELETED", label: "삭제됨"},
+  { value: "CLOSED", label: "운영 종료" },
+  { value: "DELETED", label: "삭제됨" },
 ];
 
 const AdminTheaterList_SchedulePage = () => {
   const navigate = useNavigate();
 
+  const [page, setPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
 
-  const [q, setQ] = useState("");
+  const [keywords, setKeywords] = useState("");
+  const [currentKeywords, setCurrentKeywords] = useState("");
   const [status, setStatus] = useState("ALL");
 
-  const filtered = useMemo(() => {
-    const keyword = q.trim().toLowerCase();
-    return (items || [])
-      .filter((it) => {
-        if (status === "ALL") return true;
-        return String(it.status) === status;
-      })
-      .filter((it) => {
-        if (!keyword) return true;
-        const hay = [it.theaterId, it.name].filter(Boolean).join(" ").toLowerCase();
-        return hay.includes(keyword);
-      });
-  }, [items, q, status]);
-
-  const load = async () => {
+  const load = async (nextPage = page) => {
     setLoading(true);
     try {
-      const data = await adminScheduleApi.getTheaters();
-      setItems(Array.isArray(data) ? data : []);
+      const params = {
+        page: nextPage,
+        size: 20,
+        sort: "createdAt,desc",
+        ...(status && status !== "ALL" ? {status} : {status}),
+        ...(keywords?.trim() ? {keywords: keywords.trim()} : {})
+      }
+      const data = await adminScheduleApi.getTheaters(params);
+      setItems(data?.content ? data.content : []);
+      setTotalPage(data.totalPages);
     } catch (e) {
       console.error(e);
       alert("영화관 목록 조회에 실패했습니다.");
@@ -49,11 +47,26 @@ const AdminTheaterList_SchedulePage = () => {
   };
 
   useEffect(() => {
-    load()
-  }, []);
+    setPage(0);
+    load();
+  }, [status, keywords]);
 
   const goSchedules = (theaterId, theaterName) => {
     navigate(`/admin/schedules/${theaterId}?theaterName=${encodeURIComponent(theaterName)}`);
+  };
+
+  // 페이징 기능 - 이전 페이지
+  const goPrev = () => {
+    const next = Math.max(0, page - 1);
+    setPage(next);
+    load(next);
+  }
+
+  // 페이징 기능 - 다음 페이지
+  const goNext = () => {
+    const next = Math.min(totalPage - 1, page + 1);
+    setPage(next);
+    load(next);
   };
 
   return (
@@ -89,15 +102,21 @@ const AdminTheaterList_SchedulePage = () => {
 
         <div className="admin-theater-list__filter admin-theater-list__filter--grow">
           <label>검색</label>
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="이름 / ID"
-          />
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            setKeywords(currentKeywords.trim());
+            setCurrentKeywords("");
+          }}>
+            <input
+              value={currentKeywords}
+              onChange={(e) => setCurrentKeywords(e.target.value)}
+              placeholder="이름 / ID"
+            />
+          </form>
         </div>
 
         <div className="admin-theater-list__count">
-          총 <strong>{filtered.length}</strong>개
+          총 <strong>{items.length}</strong>개
         </div>
       </div>
 
@@ -122,7 +141,7 @@ const AdminTheaterList_SchedulePage = () => {
               </tr>
             )}
 
-            {!loading && filtered.length === 0 && (
+            {!loading && items.length === 0 && (
               <tr>
                 <td colSpan={4} className="admin-theater-list__empty">
                   표시할 영화관이 없습니다.
@@ -131,23 +150,21 @@ const AdminTheaterList_SchedulePage = () => {
             )}
 
             {!loading &&
-              filtered.map((it) => {
-                const id = it.theaterId ?? it.id;
-                const name = it.theaterName ?? it.name;
+              items.map((i) => {
                 return (
-                  <tr key={id}>
-                    <td>{id}</td>
-                    <td>{it.theaterName}</td>
+                  <tr key={i.theaterId}>
+                    <td>{i.theaterId}</td>
+                    <td>{i.theaterName}</td>
                     <td>
-                      <span className={`status-badge status-${it.status}`}>
-                        {it.status}
+                      <span className={`status-badge status-${i.status}`}>
+                        {i.status}
                       </span>
                     </td>
                     <td>
                       <button
                         type="button"
                         className="admin-theater-list__action"
-                        onClick={() => goSchedules(id, name)}
+                        onClick={() => goSchedules(i.theaterId, i.theaterName)}
                       >
                         선택
                       </button>
@@ -158,6 +175,22 @@ const AdminTheaterList_SchedulePage = () => {
           </tbody>
         </table>
       </div>
+
+      {/* ===== Pager ===== */}
+        <div className="pager">
+          <button onClick={goPrev} disabled={loading || page <= 0}>
+            이전
+          </button>
+          <div className="pager__info">
+            {totalPage > 0 ? `${page + 1} / ${totalPage}` : "-"}
+          </div>
+          <button
+            onClick={goNext}
+            disabled={loading || page + 1 >= totalPage}
+          >
+            다음
+          </button>
+        </div>
     </div>
   );
 };

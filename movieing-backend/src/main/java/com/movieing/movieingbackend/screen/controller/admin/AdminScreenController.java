@@ -2,6 +2,7 @@ package com.movieing.movieingbackend.screen.controller.admin;
 
 import com.movieing.movieingbackend.aspect.ApiResponse;
 import com.movieing.movieingbackend.screen.dto.admin.*;
+import com.movieing.movieingbackend.screen.entity.ScreenStatus;
 import com.movieing.movieingbackend.screen.service.admin.AdminScreenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +30,11 @@ public class AdminScreenController {
     @GetMapping("/{theaterId}/getList")
     public ApiResponse<Page<ScreenListItemAdminResponseDto>> getList(
             @PathVariable Long theaterId,
-            @PageableDefault(
-                    size = 20,
-                    sort = "updatedAt",
-                    direction = Sort.Direction.DESC
-            ) Pageable pageable
+            @RequestParam(required = false) ScreenStatus status,
+            @RequestParam(required = false) String keywords,
+            Pageable pageable
     ) {
-        return ApiResponse.success(adminScreenService.getList(theaterId, pageable));
+        return ApiResponse.success(adminScreenService.getList(theaterId, pageable, status, keywords));
     }
 
     /**

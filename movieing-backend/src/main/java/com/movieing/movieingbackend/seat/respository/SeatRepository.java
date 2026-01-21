@@ -1,6 +1,7 @@
 package com.movieing.movieingbackend.seat.respository;
 
 import com.movieing.movieingbackend.seat.entity.Seat;
+import com.movieing.movieingbackend.seat.entity.SeatStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +27,5 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
      */
     List<Seat> findByScreen_ScreenIdOrderBySeatRowAscSeatColAsc(Long screenId);
 
+    Long countByStatus(SeatStatus status);
 }

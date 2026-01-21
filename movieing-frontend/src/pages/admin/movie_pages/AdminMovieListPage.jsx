@@ -5,16 +5,19 @@ import { adminMovieApi } from './adminMovieApi';
 
 const STATUS_OPTIONS = [
     { value: "ALL", label: "전체" },
-    { value: "DRAFT", label: "DRAFT" },
-    { value: "COMING_SOON", label: "COMING_SOON" },
-    { value: "NOW_SHOWING", label: "NOW_SHOWING" },
-    { value: "HIDDEN", label: "HIDDEN" },
-    { value: "ENDED", label: "ENDED" },
-    { value: "DELETED", label: "DELETED" },
+    { value: "DRAFT", label: "임시 저장" },
+    { value: "COMMING_SOON", label: "개봉 전" },
+    { value: "NOW_SHOWING", label: "상영 중" },
+    { value: "HIDDEN", label: "숨김" },
+    { value: "ENDED", label: "상영 종료" },
+    { value: "DELETED", label: "삭제 됨" },
 ];
 
 const AdminMovieListPage = () => {
     const navigate = useNavigate();
+
+    const [page, setPage] = useState(0);
+    const [totalPage, setTotalPage] = useState(0);
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,18 +37,29 @@ const AdminMovieListPage = () => {
         endingSoonMovies: 0,
     });
     const [statsLoading, setStatsLoading] = useState(false);
+    const [statsError, setStatsError] = useState(null);
 
     // 🔹 필터 상태
     const [status, setStatus] = useState("ALL");
-    const [q, setQ] = useState("");
+    const [keywords, setKeywords] = useState("");
+    const [currentKeywords, setCurrentKeywords] = useState("");
 
-    const load = async () => {
+    const load = async (nextPage = page) => {
         setLoading(true);
         setError(null);
         try {
-            const page = await adminMovieApi.getList({ page: 0, size: 20 });
+            const params = {
+                page: nextPage,
+                size: 20,
+                sort: 'createdAt,desc',
+                ...(status && status !== "ALL" ? { status } : {}),
+                ...(keywords?.trim() ? { keywords: keywords.trim() } : {})
+            }
+            const page = await adminMovieApi.getList(params);
             setItems(page?.content ?? []);
+            setTotalPage(page.totalPages);
         } catch (e) {
+            console.error(e);
             setError(e?.response?.data?.resultMessage ?? "목록 조회 실패");
         } finally {
             setLoading(false);
@@ -56,10 +70,10 @@ const AdminMovieListPage = () => {
         setStatsLoading(true);
         try {
             const data = await adminMovieApi.getStats();
-            console.log(data ?? null);
             setStats(data);
         } catch (e) {
             console.error(e);
+            setStatsError(e.message);
         } finally {
             setStatsLoading(false);
         }
@@ -67,29 +81,11 @@ const AdminMovieListPage = () => {
 
     useEffect(() => {
         load();
+    }, [status, keywords]);
+
+    useEffect(() => {
         statsLoad();
     }, []);
-
-    const filtered = useMemo(() => {
-        const keyword = q.trim().toLowerCase();
-
-        return items
-            .filter((m) => {
-                if (status === "ALL") return true;
-                return m.status === status;
-            })
-            .filter((m) => {
-                if (!keyword) return true;
-                const hay = [
-                    m.movieId,
-                    m.title,
-                ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
-                return hay.includes(keyword);
-            });
-    }, [items, status, q]);
 
     const onCreateDraft = async () => {
         try {
@@ -98,6 +94,20 @@ const AdminMovieListPage = () => {
         } catch (e) {
             alert(e?.response?.data?.resultMessage ?? e?.message ?? "초안 생성 실패");
         }
+    };
+
+    // 페이징 기능 - 이전 페이지
+    const goPrev = () => {
+        const next = Math.max(0, page - 1);
+        setPage(next);
+        load(next);
+    }
+
+    // 페이징 기능 - 다음 페이지
+    const goNext = () => {
+        const next = Math.min(totalPage - 1, page + 1);
+        setPage(next);
+        load(next);
     };
 
     if (loading) return <div>로딩중...</div>;
@@ -134,15 +144,29 @@ const AdminMovieListPage = () => {
                                 </tr>
                             </thead>
 
-                            <tbody className="admin-movie-list__stats-tbody">
-                                <tr>
-                                    <td>{stats.totalMovies}</td>
-                                    <td>{stats.showingMovies}</td>
-                                    <td>{stats.draftMovies}</td>
-                                    <td>{stats.endedMovies}</td>
-                                    <td>{stats.hiddenMovies}</td>
-                                </tr>
-                            </tbody>
+                            {statsError ? (
+                                <tbody>
+                                    <tr>
+                                        <td className="admin-movie-list__empty" colSpan={5}>에러 {statsError}</td>
+                                    </tr>
+                                </tbody>
+                            ) : (statsLoading ? (
+                                <tbody>
+                                    <tr>
+                                        <td className="admin-movie-list__empty" colSpan={5}>로딩중...</td>
+                                    </tr>
+                                </tbody>
+                            ) : (
+                                <tbody className="admin-movie-list__stats-tbody">
+                                    <tr>
+                                        <td>{stats.totalMovies}</td>
+                                        <td>{stats.showingMovies}</td>
+                                        <td>{stats.draftMovies}</td>
+                                        <td>{stats.endedMovies}</td>
+                                        <td>{stats.hiddenMovies}</td>
+                                    </tr>
+                                </tbody>
+                            ))}
                         </table>
                     </div>
                 </div>
@@ -159,14 +183,28 @@ const AdminMovieListPage = () => {
                                 </tr>
                             </thead>
 
-                            <tbody className="admin-movie-list__stats-tbody">
-                                <tr>
-                                    <td>{stats.topBookedMovie} - {stats.topBookedMovieCount}</td>
-                                    <td>{stats.topRevenueMovie} - {stats.topRevenueMovieAmount}원</td>
-                                    <td>{stats.todayBookedMovies}</td>
-                                    <td>{stats.endingSoonMovies}</td>
-                                </tr>
-                            </tbody>
+                            {statsError ? (
+                                <tbody>
+                                    <tr>
+                                        <td className="admin-movie-list__empty" colSpan={4}>에러 {statsError}</td>
+                                    </tr>
+                                </tbody>
+                            ) : (statsLoading ? (
+                                <tbody>
+                                    <tr>
+                                        <td className="admin-movie-list__empty" colSpan={4}>로딩 중...</td>
+                                    </tr>
+                                </tbody>
+                            ) : (
+                                <tbody className="admin-movie-list__stats-tbody">
+                                    <tr>
+                                        <td>{stats.topBookedMovie} - {stats.topBookedMovieCount}</td>
+                                        <td>{stats.topRevenueMovie} - {stats.topRevenueMovieAmount}원</td>
+                                        <td>{stats.todayBookedMovies}</td>
+                                        <td>{stats.endingSoonMovies}</td>
+                                    </tr>
+                                </tbody>
+                            ))}
                         </table>
                     </div>
                 </div>
@@ -189,15 +227,21 @@ const AdminMovieListPage = () => {
 
                     <div className="admin-movie-list__filter admin-movie-list__filter--grow">
                         <label>검색</label>
-                        <input
-                            value={q}
-                            onChange={(e) => setQ(e.target.value)}
-                            placeholder="영화 제목 / ID"
-                        />
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            setKeywords(currentKeywords.trim());
+                            setCurrentKeywords("");
+                        }}>
+                            <input
+                                value={currentKeywords}
+                                onChange={(e) => setCurrentKeywords(e.target.value)}
+                                placeholder="영화 제목 / ID"
+                            />
+                        </form>
                     </div>
 
                     <div className="admin-movie-list__count">
-                        총 <strong>{filtered.length}</strong>개
+                        총 <strong>{items.length}</strong>개
                     </div>
                 </div>
 
@@ -217,11 +261,11 @@ const AdminMovieListPage = () => {
                             {items.length === 0 ? (
                                 <tr>
                                     <td className="admin-movie-list__empty" colSpan={5}>
-                                        아직 등록된 영화가 없습니다. “영화(초안) 등록”로 시작해보세요.
+                                        검색 결과가 없습니다.
                                     </td>
                                 </tr>
                             ) : (
-                                filtered.map((m) => (
+                                items.map((m) => (
                                     <tr
                                         key={m.movieId}
                                         className="admin-movie-list__row"
@@ -249,6 +293,21 @@ const AdminMovieListPage = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                <div className="pager">
+                    <button onClick={goPrev} disabled={loading || page <= 0}>
+                        이전
+                    </button>
+                    <div className="pager__info">
+                        {totalPage > 0 ? `${page + 1} / ${totalPage}` : "-"}
+                    </div>
+                    <button
+                        onClick={goNext}
+                        disabled={loading || page + 1 >= totalPage}
+                    >
+                        다음
+                    </button>
                 </div>
             </div>
         </div>

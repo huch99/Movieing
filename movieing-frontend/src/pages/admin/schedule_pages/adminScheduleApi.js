@@ -4,8 +4,8 @@ const BASE = "/admin/schedules";
 
 export const adminScheduleApi = {
     // 영화관 목록 (ACTIVE, HIDDEN)
-    getTheaters: async () => {
-        const res = await api.get(`${BASE}/theaters`);
+    getTheaters: async (params) => {
+        const res = await api.get(`${BASE}/theaters`, {params});
         return res.data;
     },
 

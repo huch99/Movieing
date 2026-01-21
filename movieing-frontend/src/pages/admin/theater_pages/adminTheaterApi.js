@@ -12,8 +12,8 @@ function unwrap(body) {
 export const adminTheaterApi = {
   // ✅ 영화관 목록 조회
   // GET /api/admin/theaters
-  async getList() {
-    const res = await api.get(BASE);
+  async getList(params) {
+    const res = await api.get(BASE, {params});
     return unwrap(res); // List<TheaterListItemAdminResponseDto>
   },
 
@@ -79,4 +79,9 @@ export const adminTheaterApi = {
     const res = await api.delete(`${BASE}/${theaterId}`);
     unwrap(res); // void
   },
+
+  getStats: async() => {
+    const res = await api.get(`${BASE}/stats`);
+    return res.data.data;
+  }
 };

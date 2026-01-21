@@ -24,9 +24,5 @@ public class TheaterListItemAdminResponseDto {
     private Long theaterId;         // 영화관 ID
     private String theaterName;     // 영화관 이름
     private String address;         // 주소
-    private Double lat;             // 위도
-    private Double lng;             // 경도
-    private LocalTime openTime;     // 영업 시작 시간
-    private LocalTime closeTime;    // 영업 종료 시간
     private TheaterStatus status;   // 영화관 상태
 }

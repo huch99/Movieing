@@ -14,7 +14,6 @@ const STATUS_OPTIONS = [
 
 const fmtDateTime = (v) => {
   if (!v) return "-";
-  // ISO 문자열 가정
   const d = new Date(v);
   if (Number.isNaN(d.getTime())) return String(v);
   return d.toLocaleString();
@@ -23,62 +22,73 @@ const fmtDateTime = (v) => {
 const AdminTheaterListPage = () => {
   const navigate = useNavigate();
 
+  const [page, setPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [items, setItems] = useState([]);
 
+  const [stats, setStats] = useState({
+    totalTheaters: 0,
+    activeTheaters: 0,
+    totalScreens: 0,
+    activeScreens: 0,
+    totalSeats: 0,
+    activeSeats: 0
+  });
+
   // UI 상태
-  const [q, setQ] = useState("");
+  const [keywords, setKeywords] = useState("");
+  const [currentKeywords, setCurrentKeywords] = useState("");
   const [status, setStatus] = useState("ALL");
 
-  // 서버에서 이미 필터링을 지원하면 여기서 params로 보내도록 바꿔도 됨
-  const filtered = useMemo(() => {
-    const keyword = q.trim().toLowerCase();
-    return (items || [])
-      .filter((it) => {
-        if (status === "ALL") return true;
-        return String(it.status) === status;
-      })
-      .filter((it) => {
-        if (!keyword) return true;
-        const hay = [
-          it.theaterId,
-          it.name,
-          it.theaterName, // 혹시 필드명이 다를 수 있어서 대비
-          it.address,
-          it.city,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        return hay.includes(keyword);
-      });
-  }, [items, q, status]);
-
-  const load = async () => {
+  const load = async (nextPage = page) => {
     setLoading(true);
     try {
-      const arr = await adminTheaterApi.getList(); // ✅ List 그대로
-      setItems(Array.isArray(arr) ? arr : []);
+      const params = {
+        page: nextPage,
+        size: 20,
+        sort: "createdAt,desc",
+        ...(status && status !== "ALL" ? { status } : {}),
+        ...(keywords?.trim() ? { keywords: keywords.trim() } : {})
+      }
+      const arr = await adminTheaterApi.getList(params);
+      setItems(arr?.content ?? []);
+      setTotalPage(arr.totalPages);
     } catch (e) {
       console.error(e);
-      alert("영화관 목록 조회에 실패했습니다.");
+      setError(e.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const statsLoad = async () => {
+    try {
+      const data = await adminTheaterApi.getStats();
+      setStats(data);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  useEffect(() => {
+    statsLoad();
+  }, []);
+
   useEffect(() => {
     load();
-  }, []);
+  }, [status, keywords])
 
   const onCreateDraft = async () => {
     try {
       const theaterId = await adminTheaterApi.createDraft(); // ✅ Long 그대로 리턴됨
-    if (!theaterId) {
-      alert("초안은 생성됐지만 ID를 확인할 수 없습니다. 목록을 새로고침합니다.");
-      await load();
-      return;
-    }
+      if (!theaterId) {
+        alert("초안은 생성됐지만 ID를 확인할 수 없습니다. 목록을 새로고침합니다.");
+        await load();
+        return;
+      }
 
       navigate(`/admin/theaters/${theaterId}`);
     } catch (e) {
@@ -86,6 +96,20 @@ const AdminTheaterListPage = () => {
       alert("영화관 초안 생성에 실패했습니다.");
     }
   };
+
+  // 페이징 기능 - 이전 페이지
+    const goPrev = () => {
+        const next = Math.max(0, page - 1);
+        setPage(next);
+        load(next);
+    }
+
+    // 페이징 기능 - 다음 페이지
+    const goNext = () => {
+        const next = Math.min(totalPages - 1, page + 1);
+        setPage(next);
+        load(next);
+    };
 
   return (
     <div className="admin-theater-list">
@@ -108,6 +132,34 @@ const AdminTheaterListPage = () => {
         </div>
       </div>
 
+      <div className="admin-theater-list__stats">
+        <div className="admin-theater-list__stats-table-wrap">
+          <table className="admin-theater-list__stats-table">
+            <thead className="admin-theater-list__stats-thead">
+              <tr>
+                <th>전체 영화관</th>
+                <th>운영 영화관</th>
+                <th>전체 상영관</th>
+                <th>운영 상영관</th>
+                <th>전체 좌석</th>
+                <th>운영 좌석</th>
+              </tr>
+            </thead>
+
+            <tbody className="admin-theater-list__stats-tbody">
+              <tr>
+                <td>{stats.totalTheaters}</td>
+                <td>{stats.activeTheaters}</td>
+                <td>{stats.totalScreens}</td>
+                <td>{stats.activeScreens}</td>
+                <td>{stats.totalSeats}</td>
+                <td>{stats.activeSeats}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* 필터 */}
       <div className="admin-theater-list__filters">
         <div className="admin-theater-list__filter">
@@ -123,15 +175,22 @@ const AdminTheaterListPage = () => {
 
         <div className="admin-theater-list__filter admin-theater-list__filter--grow">
           <label>검색</label>
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="이름 / 주소 / ID"
-          />
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            setKeywords(currentKeywords.trim());
+            setCurrentKeywords("");
+          }}>
+            <input
+              value={currentKeywords}
+              onChange={(e) => setCurrentKeywords(e.target.value)}
+              placeholder="이름 / 주소 / ID"
+            />
+          </form>
+
         </div>
 
         <div className="admin-theater-list__count">
-          총 <strong>{filtered.length}</strong>개
+          총 <strong>{items.length}</strong>개
         </div>
       </div>
 
@@ -144,63 +203,80 @@ const AdminTheaterListPage = () => {
               <th>이름</th>
               <th>주소</th>
               <th>상태</th>
-              <th>수정일</th>
               <th>작업</th>
             </tr>
           </thead>
 
           <tbody>
-            {loading && (
+            {error ? (
               <tr>
-                <td colSpan={6} className="admin-theater-list__empty">
-                  로딩 중...
-                </td>
+                <td className="admin-theater-list__empty" colSpan={6}>에러: {error}</td>
               </tr>
-            )}
-
-            {!loading && filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} className="admin-theater-list__empty">
-                  표시할 영화관이 없습니다.
-                </td>
-              </tr>
-            )}
-
-            {!loading &&
-              filtered.map((it) => {
-                const id = it.theaterId ?? it.id;
-                return (
-                  <tr key={id}>
-                    <td>{id}</td>
-                    <td>
-                      <Link
-                        to={`/admin/theaters/${id}`}
-                        className="admin-theater-list__link"
-                      >
-                        {it.name ?? it.theaterName}
-                      </Link>
-                    </td>
-                    <td>{it.address ?? "-"}</td>
-                    <td>
-                      <span className={`status-badge status-${it.status}`}>
-                        {it.status}
-                      </span>
-                    </td>
-                    <td>{fmtDateTime(it.updatedAt)}</td>
-                    <td>
-                      <Link
-                        to={`/admin/theaters/${id}`}
-                        className="admin-theater-list__action"
-                      >
-                        상세
-                      </Link>
+            ) : (
+              loading ? (
+                <tr>
+                  <td colSpan={6} className="admin-theater-list__empty">
+                    로딩 중...
+                  </td>
+                </tr>
+              ) : (
+                items.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="admin-theater-list__empty">
+                      표시할 영화관이 없습니다.
                     </td>
                   </tr>
-                );
-              })}
+                ) : (
+                  items.map((i) => {
+                    return (
+                      <tr key={i.theaterId}>
+                        <td>{i.theaterId}</td>
+                        <td>
+                          <Link
+                            to={`/admin/theaters/${i.theaterId}`}
+                            className="admin-theater-list__link"
+                          >
+                            {i.theaterName}
+                          </Link>
+                        </td>
+                        <td>{i.address ?? "-"}</td>
+                        <td>
+                          <span className={`status-badge status-${i.status}`}>
+                            {i.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link
+                            to={`/admin/theaters/${i.theaterId}`}
+                            className="admin-theater-list__action"
+                          >
+                            상세
+                          </Link>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )
+              )
+            )}
           </tbody>
         </table>
       </div>
+
+      <div className="pager">
+            <button onClick={goPrev} disabled={loading || page <= 0}>
+                이전
+            </button>
+            <div className="pager__info">
+                {totalPage > 0 ? `${page + 1} / ${totalPage}` : "-"}
+            </div>
+            <button
+                onClick={goNext}
+                disabled={loading || page + 1 >= totalPage}
+            >
+                다음
+            </button>
+        </div>
     </div>
   );
 };

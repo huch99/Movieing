@@ -1,12 +1,19 @@
 package com.movieing.movieingbackend.theater.service.admin;
 
+import com.movieing.movieingbackend.aspect.ApiResponse;
 import com.movieing.movieingbackend.common.exception.ConflictException;
 import com.movieing.movieingbackend.common.exception.NotFoundException;
+import com.movieing.movieingbackend.screen.entity.ScreenStatus;
+import com.movieing.movieingbackend.screen.repository.ScreenRepository;
+import com.movieing.movieingbackend.seat.entity.SeatStatus;
+import com.movieing.movieingbackend.seat.respository.SeatRepository;
 import com.movieing.movieingbackend.theater.dto.admin.*;
 import com.movieing.movieingbackend.theater.entity.Theater;
 import com.movieing.movieingbackend.theater.entity.TheaterStatus;
 import com.movieing.movieingbackend.theater.repository.TheaterRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,20 +32,38 @@ import java.util.List;
 public class AdminTheaterService {
 
     private final TheaterRepository theaterRepository;
+    private final ScreenRepository screenRepository;
+    private final SeatRepository seatRepository;
 
     /**
      * 상태 조건으로 영화관 목록 조회 (Admin)
+     * 스케줄 페이지에서 사용
      */
-    public List<TheaterListItemAdminResponseDto> getListByStatuses(List<TheaterStatus> statuses) {
-        return theaterRepository.findByStatusIn(statuses)
-                .stream()
-                .map(theater -> TheaterListItemAdminResponseDto.builder()
-                        .theaterId(theater.getTheaterId())
-                        .theaterName(theater.getTheaterName())
-                        .status(theater.getStatus())
+    @Transactional(readOnly = true)
+    public Page<TheaterListItemAdminResponseDto> getListByStatuses(List<TheaterStatus> statuses, Pageable pageable) {
+        return theaterRepository.findByStatusIn(statuses, pageable)
+                .map(t -> TheaterListItemAdminResponseDto.builder()
+                        .theaterId(t.getTheaterId())
+                        .theaterName(t.getTheaterName())
+                        .address(t.getAddress())
+                        .status(t.getStatus())
                         .build()
-                )
-                .toList();
+                );
+    }
+
+    /**
+     * 어드민 영화관 통계 조회
+     */
+    @Transactional(readOnly = true)
+    public TheaterStatsAdminResponseDto getStats() {
+        return TheaterStatsAdminResponseDto.builder()
+                .totalTheaters(theaterRepository.countByStatusNot(TheaterStatus.DELETED))
+                .activeTheaters(theaterRepository.countByStatus(TheaterStatus.ACTIVE))
+                .totalScreens(screenRepository.countByStatusNot(ScreenStatus.DELETED))
+                .activeScreens(screenRepository.countByStatus(ScreenStatus.ACTIVE))
+                .totalSeats(seatRepository.count())
+                .activeSeats(seatRepository.countByStatus(SeatStatus.ACTIVE))
+                .build();
     }
 
     /**
@@ -47,20 +72,37 @@ public class AdminTheaterService {
      * - 관리자 영화관 관리 리스트 화면에서 사용
      */
     @Transactional(readOnly = true)
-    public List<TheaterListItemAdminResponseDto> getList() {
-        return theaterRepository.findAllByStatusNot(TheaterStatus.DELETED)
-                .stream()
-                .map(t -> TheaterListItemAdminResponseDto.builder()
+    public Page<TheaterListItemAdminResponseDto> getList(Pageable pageable, TheaterStatus status, String keywords) {
+        String q = (keywords == null ? null : keywords.trim().toLowerCase());
+        boolean hasKeywords = (q != null && !q.isBlank());
+
+        Long id = null;
+        if(hasKeywords && q.matches("^\\d+$")) {
+            id = Long.valueOf(q);
+        }
+
+        Page<Theater> page;
+
+        if(status == null) {
+            if(!hasKeywords) {
+                page = theaterRepository.findAllByStatusNot(TheaterStatus.DELETED, pageable);
+            } else {
+                page = theaterRepository.searchNotDeleted(TheaterStatus.DELETED, q.toLowerCase(), id, pageable);
+            }
+        } else {
+            if(!hasKeywords) {
+                page = theaterRepository.findByStatus(status, pageable);
+            } else {
+                page = theaterRepository.searchByStatus(status, q.toLowerCase(), id, pageable);
+            }
+        }
+        return page.map(t -> TheaterListItemAdminResponseDto.builder()
                         .theaterId(t.getTheaterId())
                         .theaterName(t.getTheaterName())
                         .address(t.getAddress())
-                        .lat(t.getLat())
-                        .lng(t.getLng())
-                        .openTime(t.getOpenTime())
-                        .closeTime(t.getCloseTime())
                         .status(t.getStatus())
                         .build()
-                ).toList();
+                );
     }
 
     /**

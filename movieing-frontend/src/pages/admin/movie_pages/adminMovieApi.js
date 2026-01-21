@@ -16,9 +16,9 @@ export const adminMovieApi = {
   },
 
   // ✅ 목록 조회 (Page)
-  async getList({ page = 0, size = 20, sort = "createdAt,desc" } = {}) {
+  async getList(params) {
     // PageableDefault가 있지만 프론트에서 명시하면 더 안정적
-    const res = await api.get(BASE, { params: { page, size, sort } });
+    const res = await api.get(BASE, {params});
     return unwrap(res); // Page<MovieListItem>
   },
 

@@ -22,7 +22,6 @@ public class MovieListItemAdminResponseDto {
 
     private Long movieId;          // 영화 ID (내부 식별자)
     private String title;          // 영화 제목
-    private String posterUrl;      // 포스터 이미지 URL
     private LocalDate releaseDate; // 개봉일
     private LocalDate endDate;     // 상영 종료일
     private MovieStatus status;    // 영화 상태
@@ -36,7 +35,6 @@ public class MovieListItemAdminResponseDto {
         return MovieListItemAdminResponseDto.builder()
                 .movieId(movie.getMovieId())
                 .title(movie.getTitle())
-                .posterUrl(movie.getPosterUrl())
                 .releaseDate(movie.getReleaseDate())
                 .endDate(movie.getEndDate())
                 .status(movie.getStatus())

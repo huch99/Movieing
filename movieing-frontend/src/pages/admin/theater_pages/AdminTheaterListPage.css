@@ -308,3 +308,84 @@
     padding: 12px;
   }
 }
+
+/* ===== Stats Section ===== */
+
+.admin-theater-list__stats {
+  margin-top: 24px;
+}
+
+.admin-theater-list__stats-table-wrap {
+  background: #0f0f0f;
+  border-radius: 12px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 테이블 기본 */
+
+.admin-theater-list__stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.admin-theater-list__stats-thead th {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: center;
+  padding: 10px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.admin-theater-list__stats-tbody td {
+  text-align: center;
+  padding: 14px 6px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* 숫자 강조용 (살짝 포인트) */
+
+.admin-theater-list__stats-tbody td {
+  position: relative;
+}
+
+.admin-theater-list__stats-tbody td::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 6px;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+}
+
+/* hover 시 살짝 강조 (카드 느낌) */
+
+.admin-theater-list__stats-table-wrap:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+/* 반응형 대비 – 좁아지면 글자 줄이기 */
+
+@media (max-width: 1200px) {
+  .admin-theater-list__stats-tbody td {
+    font-size: 14px;
+  }
+
+  .admin-theater-list__stats-thead th {
+    font-size: 11px;
+  }
+}
+

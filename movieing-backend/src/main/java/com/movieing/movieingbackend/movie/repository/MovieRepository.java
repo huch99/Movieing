@@ -37,8 +37,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
      */
     List<Movie> findByStatusAndEndDateLessThan(MovieStatus status, LocalDate date);
 
-
-    // 어드민 목록용 (DELETED 제외 같은 정책이 있으면 여기서 쓰기)
     /**
      * 특정 상태를 제외한 영화 목록 조회
      *
@@ -47,12 +45,29 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
      */
     Page<Movie> findByStatusNot(MovieStatus status, Pageable pageable);
 
+    /**
+     * 특정 상태들을 포함한 영화 목록 조회
+     * */
     List<Movie> findByStatusIn(List<MovieStatus> statuses);
 
+    /**
+     * 특정 상태를 제외한 영화 갯수 카운트
+     * */
     Long countByStatusNot(MovieStatus status);
+
+    /**
+     * 특정 상태 영화 갯수 카운트
+     * */
     Long countByStatus(MovieStatus status);
+
+    /**
+     * 상태 영화 갯수 가운트
+     * */
     Long countByStatusIn(List<MovieStatus> statuses);
 
+    /**
+     * 상영중인 영화 중, 종료일 기준 7일 이내의 기간을 가진 영화 카운트
+     * */
     @Query("""
         select count(m.movieId)
         from Movie m
@@ -66,4 +81,35 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             @Param("today") LocalDate today,
             @Param("endDate") LocalDate endDate
     );
+
+    Page<Movie> findByStatus(MovieStatus status, Pageable pageable);
+
+    @Query("""
+        select m
+        from Movie m
+        where m.status <> :deleted
+            and (
+                lower(cast(m.title as string)) like concat('%', lower(:keywords), '%')
+                or (:id is not null and m.movieId = :id)
+                )
+    """)
+    Page<Movie> searchNotDeleted(
+            @Param("deleted") MovieStatus deleted,
+            @Param("keywords") String keywords,
+            @Param("id") Long id,
+            Pageable pageable);
+
+    @Query("""
+        select m
+        from Movie m
+        where m.status = :status
+            and (
+                lower(cast(m.title as string)) like concat('%', lower(:keywords), '%')
+                or (:id is not null and m.movieId = :id) 
+            )
+    """)
+    Page<Movie> searchByStatus(@Param("status") MovieStatus status,
+                               @Param("keywords") String keywords,
+                               @Param("id") Long id,
+                               Pageable pageable);
 }

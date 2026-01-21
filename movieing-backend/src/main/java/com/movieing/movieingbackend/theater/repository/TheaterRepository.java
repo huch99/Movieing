@@ -2,7 +2,11 @@ package com.movieing.movieingbackend.theater.repository;
 
 import com.movieing.movieingbackend.theater.entity.Theater;
 import com.movieing.movieingbackend.theater.entity.TheaterStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,7 +32,45 @@ public interface TheaterRepository extends JpaRepository<Theater, Long> {
      * @param status 제외할 영화관 상태
      * @return 상태가 status가 아닌 영화관 목록
      */
-    List<Theater> findAllByStatusNot(TheaterStatus status);
+    Page<Theater> findAllByStatusNot(TheaterStatus status, Pageable pageable);
 
-    List<Theater> findByStatusIn(List<TheaterStatus> statuses);
+    Page<Theater> findByStatusIn(List<TheaterStatus> statuses, Pageable pageable);
+
+    Long countByStatusNot(TheaterStatus status);
+
+    Long countByStatus(TheaterStatus status);
+
+    Page<Theater> findByStatus(TheaterStatus status, Pageable pageable);
+
+    @Query("""
+        select t
+        from Theater t
+        where t.status <> :deleted
+            and (
+                lower(cast(t.theaterName as string)) like concat('%', lower(:keywords), '%')
+                or lower(cast(t.address as string)) like concat('%', lower(:keywords), '%') 
+                or (:id is not null and t.theaterId = :id)
+            )
+    """)
+    Page<Theater> searchNotDeleted(
+            @Param("deleted") TheaterStatus deleted,
+            @Param("keywords") String keywords,
+            @Param("id") Long id,
+            Pageable pageable
+    );
+
+    @Query("""
+    select t
+    from Theater t
+    where t.status = :status
+        and (
+        lower(cast(t.theaterName as string)) like concat('%', lower(:keywords), '%')
+        or lower(cast(t.address as string)) like concat('%', lower(:keywords), '%')
+        or (:id is not null and t.theaterId = :id)
+    )
+""")
+    Page<Theater> searchByStatus(@Param("status") TheaterStatus status,
+                               @Param("keywords") String keywords,
+                               @Param("id") Long id,
+                               Pageable pageable);
 }

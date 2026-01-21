@@ -559,3 +559,27 @@
   }
 }
 
+/* ===== override: keep concept, just polish ===== */
+
+/* 리스트 테이블: 중앙정렬(제목만 좌측) */
+.admin-movie-list__thead th { text-align: center; }
+.admin-movie-list__tbody td { text-align: center; vertical-align: middle; }
+.admin-movie-list__title-cell { text-align: left; }
+
+/* 통계 테이블: 중앙정렬 */
+.admin-movie-list__stats-thead th { text-align: center; }
+.admin-movie-list__stats-tbody td { text-align: center; vertical-align: middle; }
+
+/* 상태 배지: 셀 안에서 보기 좋게 */
+.admin-movie-list__status { text-align: center; }
+.admin-movie-list__badge { justify-content: center; min-width: 120px; }
+
+/* hover만 살짝 더 고급스럽게 (색 유지) */
+.admin-movie-list__row:hover td { background: rgba(124, 58, 237, 0.12); }
+.admin-movie-list__row:active td { background: rgba(124, 58, 237, 0.16); }
+
+/* 마지막 줄 border 정리 */
+.admin-movie-list__tbody tr:last-child td { border-bottom: none; }
+.admin-movie-list__stats-tbody tr:last-child td { border-bottom: none; }
+
+

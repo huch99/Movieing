@@ -2,9 +2,15 @@ package com.movieing.movieingbackend.theater.controller.admin;
 
 import com.movieing.movieingbackend.aspect.ApiResponse;
 import com.movieing.movieingbackend.theater.dto.admin.*;
+import com.movieing.movieingbackend.theater.entity.Theater;
+import com.movieing.movieingbackend.theater.entity.TheaterStatus;
 import com.movieing.movieingbackend.theater.service.admin.AdminTheaterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +28,19 @@ public class AdminTheaterController {
      * - 어드민 영화관 관리 리스트 화면에서 사용
      */
     @GetMapping
-    public ApiResponse<List<TheaterListItemAdminResponseDto>> getList() {
-        return ApiResponse.success(adminTheaterService.getList());
+    public ApiResponse<Page<TheaterListItemAdminResponseDto>> getList(
+            @RequestParam(required = false) TheaterStatus status,
+            @RequestParam(required = false) String keywords,
+            Pageable pageable) {
+        return ApiResponse.success(adminTheaterService.getList(pageable, status, keywords));
+    }
+
+    /**
+     * 어드민 영화관 통계
+     */
+    @GetMapping("/stats")
+    public ApiResponse<TheaterStatsAdminResponseDto> getStats() {
+        return ApiResponse.success(adminTheaterService.getStats());
     }
 
     /**

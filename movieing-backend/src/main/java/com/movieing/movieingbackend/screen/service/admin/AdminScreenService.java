@@ -19,7 +19,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AdminScreenService {
 
     private final ScreenRepository screenRepository;
@@ -29,6 +28,7 @@ public class AdminScreenService {
      * 상태 조건으로 상영관 목록 조회
      *
      * */
+    @Transactional(readOnly = true)
     public List<ScreenListItemAdminResponseDto> getListByStatus(Long theaterId, List<ScreenStatus> statuses) {
         Theater theater = getTheaterEntity(theaterId);
 
@@ -42,17 +42,46 @@ public class AdminScreenService {
      * 상영관 목록 조회 (관리자)
      * - DELETED 제외 목록 조회
      */
-    public Page<ScreenListItemAdminResponseDto> getList(Long TheaterId, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<ScreenListItemAdminResponseDto> getList(Long TheaterId, Pageable pageable, ScreenStatus status, String keywords) {
         Theater theater = getTheaterEntity(TheaterId);
 
-        return screenRepository
-                .findByTheater_TheaterIdAndStatusNot(theater.getTheaterId(), ScreenStatus.DELETED, pageable)
-                .map(ScreenListItemAdminResponseDto::from);
+        String q = (keywords == null ? null : keywords.trim().toLowerCase());
+        boolean hasKeywords = (q != null && !q.isBlank());
+
+        Long id = null;
+        if(hasKeywords && q.matches("^\\d+$")) {
+            id = Long.valueOf(q);
+        }
+
+        Page<Screen> page;
+
+        if(status == null) {
+            if(!hasKeywords) {
+                page = screenRepository.findByTheater_TheaterIdAndStatusNot(theater.getTheaterId(), ScreenStatus.DELETED, pageable);
+            } else {
+                page = screenRepository.searchNotDeleted(theater.getTheaterId(), ScreenStatus.DELETED, q.toLowerCase(), id, pageable);
+            }
+        } else {
+            if(!hasKeywords) {
+                page = screenRepository.findByTheater_TheaterIdAndStatus(theater.getTheaterId(), status, pageable);
+            } else {
+                page = screenRepository.searchByStatus(theater.getTheaterId(), status, q.toLowerCase(), id, pageable);
+            }
+        }
+
+        return page.map(s -> ScreenListItemAdminResponseDto.builder()
+                .screenId(s.getScreenId())
+                .screenName(s.getScreenName())
+                .capacity(s.getCapacity())
+                .status(s.getStatus())
+                .build());
     }
 
     /**
      * 상영관 상세 조회 (관리자)
      */
+    @Transactional(readOnly = true)
     public ScreenDetailAdminResponseDto getDetail(Long screenId) {
         Screen screen = getEntity(screenId);
         return toDetailDto(screen);

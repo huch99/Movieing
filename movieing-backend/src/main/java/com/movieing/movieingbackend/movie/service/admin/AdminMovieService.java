@@ -63,7 +63,6 @@ public class AdminMovieService {
                         .releaseDate(m.getReleaseDate())
                         .endDate(m.getEndDate())
                         .status(m.getStatus())
-                        .posterUrl(m.getPosterUrl())
                         .build())
                 .toList();
     }
@@ -305,9 +304,31 @@ public class AdminMovieService {
      * - Page 기반 페이징/정렬 지원
      */
     @Transactional(readOnly = true)
-    public Page<MovieListItemAdminResponseDto> getList(Pageable pageable) {
-        return movieRepository.findByStatusNot(MovieStatus.DELETED, pageable)
-                .map(MovieListItemAdminResponseDto::from);
+    public Page<MovieListItemAdminResponseDto> getList(Pageable pageable, MovieStatus status, String keywords) {
+        String q = (keywords == null) ? null : keywords.trim();
+        boolean hasKeywords = (q != null && !q.isBlank());
+
+        Long id = null;
+        if(hasKeywords && q.matches("^\\d+$")) {
+            id = Long.valueOf(q);
+        }
+
+        Page<Movie> page;
+
+        if(status == null) {
+            if(!hasKeywords) {
+                page = movieRepository.findByStatusNot(MovieStatus.DELETED, pageable);
+            } else {
+                page = movieRepository.searchNotDeleted(MovieStatus.DELETED,q.toLowerCase(), id, pageable);
+            }
+        } else {
+            if(!hasKeywords) {
+                page = movieRepository.findByStatus(status, pageable);
+            } else {
+                page = movieRepository.searchByStatus(status, q.toLowerCase(), id, pageable);
+            }
+        }
+        return page.map(MovieListItemAdminResponseDto::from);
     }
 
     /**

@@ -11,9 +11,9 @@ function unwrap(body) {
 export const adminScreenApi = {
 
     // 특정 영화관의 상영관 목록 조회
-    async getListByTheater(theaterId) {
+    async getListByTheater(theaterId, params) {
         if (!theaterId) throw new Error("theaterId is required");
-        const res = await api.get(`${BASE}/${theaterId}/getList`)
+        const res = await api.get(`${BASE}/${theaterId}/getList`, {params});
         return unwrap(res);
     },
 
