@@ -15,10 +15,25 @@ const STATUS_OPTIONS = [
 
 const AdminMovieListPage = () => {
     const navigate = useNavigate();
-    
+
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [stats, setStats] = useState({
+        totalMovies: 0,
+        showingMovies: 0,
+        draftMovies: 0,
+        endedMovies: 0,
+        hiddenMovies: 0,
+        topBookedMovie: null,
+        topBookedMovieCount: 0,
+        topRevenueMovie: null,
+        topRevenueMovieAmount: 0,
+        todayBookedMovies: 0,
+        endingSoonMovies: 0,
+    });
+    const [statsLoading, setStatsLoading] = useState(false);
 
     // 🔹 필터 상태
     const [status, setStatus] = useState("ALL");
@@ -37,8 +52,22 @@ const AdminMovieListPage = () => {
         }
     };
 
+    const statsLoad = async () => {
+        setStatsLoading(true);
+        try {
+            const data = await adminMovieApi.getStats();
+            console.log(data ?? null);
+            setStats(data);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setStatsLoading(false);
+        }
+    };
+
     useEffect(() => {
         load();
+        statsLoad();
     }, []);
 
     const filtered = useMemo(() => {
@@ -107,18 +136,42 @@ const AdminMovieListPage = () => {
 
                             <tbody className="admin-movie-list__stats-tbody">
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{stats.totalMovies}</td>
+                                    <td>{stats.showingMovies}</td>
+                                    <td>{stats.draftMovies}</td>
+                                    <td>{stats.endedMovies}</td>
+                                    <td>{stats.hiddenMovies}</td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>                    
+                    </div>
                 </div>
 
-                 {/* ===== Filters ===== */}
+                <div className="admin-movie-list__stats">
+                    <div className="admin-movie-list__stats-table-wrap">
+                        <table className="admin-movie-list__stats-table">
+                            <thead className="admin-movie-list__stats-thead">
+                                <tr>
+                                    <th>누적 예매 Top</th>
+                                    <th>매출 Top</th>
+                                    <th>오늘 예매 발생 영화</th>
+                                    <th>상영기간 만료 임박</th>
+                                </tr>
+                            </thead>
+
+                            <tbody className="admin-movie-list__stats-tbody">
+                                <tr>
+                                    <td>{stats.topBookedMovie} - {stats.topBookedMovieCount}</td>
+                                    <td>{stats.topRevenueMovie} - {stats.topRevenueMovieAmount}원</td>
+                                    <td>{stats.todayBookedMovies}</td>
+                                    <td>{stats.endingSoonMovies}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* ===== Filters ===== */}
                 <div className="admin-movie-list__filters">
                     <div className="admin-movie-list__filter">
                         <label>상태</label>

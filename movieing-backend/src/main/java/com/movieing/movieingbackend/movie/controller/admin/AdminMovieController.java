@@ -127,4 +127,10 @@ public class AdminMovieController {
     public ResponseEntity<ApiResponse<MovieDetailAdminResponseDto>> getDetail(@PathVariable Long movieId) {
         return ResponseEntity.ok(ApiResponse.success(adminMovieService.getDetail(movieId)));
     }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<MovieStatsAdminResponseDto>> getStats() {
+        MovieStatsAdminResponseDto stats = adminMovieService.getStats();
+        return ResponseEntity.ok(ApiResponse.success(stats));
+    }
 }

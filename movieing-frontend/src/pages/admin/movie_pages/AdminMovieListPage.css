@@ -465,3 +465,97 @@
   }
 }
 
+
+/* ===== Stats blocks ===== */
+.admin-movie-list__stats {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.32), rgba(2, 6, 23, 0.18));
+  backdrop-filter: blur(10px);
+}
+
+.admin-movie-list__stats-table-wrap {
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(2, 6, 23, 0.20));
+}
+
+.admin-movie-list__stats-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-movie-list__stats-thead th {
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: rgba(229, 231, 235, 0.78);
+  background: rgba(15, 23, 42, 0.56);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  white-space: nowrap;
+}
+
+.admin-movie-list__stats-tbody td {
+  padding: 14px 14px;
+  font-size: 14px;
+  font-weight: 850;
+  color: rgba(229, 231, 235, 0.90);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  background: rgba(2, 6, 23, 0.16);
+  font-variant-numeric: tabular-nums;
+}
+
+/* zebra */
+.admin-movie-list__stats-tbody tr:nth-child(even) td {
+  background: rgba(2, 6, 23, 0.22);
+}
+
+/* subtle hover */
+.admin-movie-list__stats-table-wrap:hover .admin-movie-list__stats-tbody td {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+/* Emphasis for “top” columns (1st & 2nd) */
+.admin-movie-list__stats-tbody td:nth-child(1),
+.admin-movie-list__stats-tbody td:nth-child(2) {
+  background:
+    linear-gradient(180deg, rgba(124, 58, 237, 0.12), rgba(2, 6, 23, 0.14));
+}
+
+/* If value is empty/null, soften */
+.admin-movie-list__stats-tbody td:empty {
+  color: rgba(229, 231, 235, 0.55);
+  font-weight: 700;
+}
+
+/* ===== Responsive (stats) ===== */
+@media (max-width: 860px) {
+  .admin-movie-list__stats {
+    padding: 10px 10px;
+  }
+
+  .admin-movie-list__stats-thead th,
+  .admin-movie-list__stats-tbody td {
+    padding: 10px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* allow horizontal scroll on small screens */
+  .admin-movie-list__stats-table-wrap {
+    overflow-x: auto;
+  }
+
+  .admin-movie-list__stats-table {
+    min-width: 720px;
+  }
+}
+

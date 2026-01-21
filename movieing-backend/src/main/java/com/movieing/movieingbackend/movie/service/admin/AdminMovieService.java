@@ -1,5 +1,6 @@
 package com.movieing.movieingbackend.movie.service.admin;
 
+import com.movieing.movieingbackend.booking_seat.repository.BookingSeatRepository;
 import com.movieing.movieingbackend.common.exception.BadRequestException;
 import com.movieing.movieingbackend.common.exception.ConflictException;
 import com.movieing.movieingbackend.common.exception.NotFoundException;
@@ -7,15 +8,21 @@ import com.movieing.movieingbackend.movie.dto.admin.*;
 import com.movieing.movieingbackend.movie.entity.Movie;
 import com.movieing.movieingbackend.movie.entity.MovieStatus;
 import com.movieing.movieingbackend.movie.repository.MovieRepository;
+import com.movieing.movieingbackend.payment.entity.PaymentStatus;
+import com.movieing.movieingbackend.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +41,8 @@ import java.util.stream.Collectors;
 public class AdminMovieService {
 
     private final MovieRepository movieRepository;
+    private final BookingSeatRepository bookingSeatRepository;
+    private final PaymentRepository paymentRepository;
 
     /**
      * 상태 목록으로 영화 목록 조회
@@ -299,6 +308,58 @@ public class AdminMovieService {
     public Page<MovieListItemAdminResponseDto> getList(Pageable pageable) {
         return movieRepository.findByStatusNot(MovieStatus.DELETED, pageable)
                 .map(MovieListItemAdminResponseDto::from);
+    }
+
+    /**
+     * 영화 통계 조회
+     * */
+    @Transactional(readOnly = true)
+    public MovieStatsAdminResponseDto getStats() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        LocalDate endDate = today.plusDays(7);
+
+        var statuses = List.of(MovieStatus.NOW_SHOWING, MovieStatus.COMMING_SOON);
+
+        var top = bookingSeatRepository.findTopBookedMovie(
+                PaymentStatus.PAID,
+                statuses,
+                PageRequest.of(0,1)
+        ).stream().findFirst().orElse(null);
+
+        var revenue = paymentRepository.findTopRevenueMovie(
+                PaymentStatus.PAID,
+                statuses,
+                PageRequest.of(0, 1)
+        ).stream().findFirst().orElse(null);
+
+        Long cnt = paymentRepository.countTodayBookedMovies(
+                PaymentStatus.PAID,
+                start,
+                end,
+                statuses
+        );
+
+        Long endingSoon = movieRepository.countEndingSoonMovies(
+                MovieStatus.NOW_SHOWING,
+                today,
+                endDate
+        );
+
+        return MovieStatsAdminResponseDto.builder()
+                .totalMovies(movieRepository.countByStatusNot(MovieStatus.DELETED))
+                .showingMovies(movieRepository.countByStatusIn(List.of(MovieStatus.NOW_SHOWING, MovieStatus.COMMING_SOON)))
+                .draftMovies(movieRepository.countByStatus(MovieStatus.DRAFT))
+                .endedMovies(movieRepository.countByStatus(MovieStatus.ENDED))
+                .hiddenMovies(movieRepository.countByStatus(MovieStatus.HIDDEN))
+                .topBookedMovie(top != null ? top.getTitle() : null)
+                .topBookedMovieCount(top != null ? top.getSeatCount() : 0L)
+                .topRevenueMovie(revenue != null ? revenue.getTitle() : null)
+                .topRevenueMovieAmount(revenue != null ? revenue.getAmount() : 0.0)
+                .todayBookedMovies(cnt != null ? cnt : 0L)
+                .endingSoonMovies(endingSoon != null ? endingSoon : 0L)
+                .build();
     }
 
     /**

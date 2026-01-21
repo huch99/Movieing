@@ -31,36 +31,41 @@ export const adminMovieApi = {
   // ✅ 임시 저장 (DRAFT에서만)
   async saveDraft(movieId, body) {
     const res = await api.put(`${BASE}/${movieId}/draft`, body);
-    unwrap(res); // void
+    return unwrap(res); // void
   },
 
   // ✅ 완료 처리 (DRAFT -> COMING_SOON)
   async complete(movieId, body) {
     const res = await api.put(`${BASE}/${movieId}/complete`, body);
-    unwrap(res); // void
+    return unwrap(res); // void
   },
 
   // ✅ 수정 (부분 수정)
   async update(movieId, body) {
     const res = await api.put(`${BASE}/${movieId}`, body);
-    unwrap(res); // void
+    return unwrap(res); // void
   },
 
   // ✅ 숨김
   async hide(movieId) {
     const res = await api.put(`${BASE}/${movieId}/hide`);
-    unwrap(res);
+    return unwrap(res);
   },
 
   // ✅ 숨김 해제
   async unhide(movieId) {
     const res = await api.put(`${BASE}/${movieId}/unhide`);
-    unwrap(res);
+    return unwrap(res);
   },
 
   // ✅ 삭제 (소프트 삭제)
   async remove(movieId) {
     const res = await api.delete(`${BASE}/${movieId}`);
-    unwrap(res);
+    return unwrap(res);
   },
+
+  getStats: async() => {
+    const res = await api.get(`${BASE}/stats`);
+    return res.data.data;
+  }
 };

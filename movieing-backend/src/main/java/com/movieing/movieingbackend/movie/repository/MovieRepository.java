@@ -5,6 +5,8 @@ import com.movieing.movieingbackend.movie.entity.MovieStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -46,4 +48,22 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     Page<Movie> findByStatusNot(MovieStatus status, Pageable pageable);
 
     List<Movie> findByStatusIn(List<MovieStatus> statuses);
+
+    Long countByStatusNot(MovieStatus status);
+    Long countByStatus(MovieStatus status);
+    Long countByStatusIn(List<MovieStatus> statuses);
+
+    @Query("""
+        select count(m.movieId)
+        from Movie m
+        where m.status = :status
+        and m.endDate is not null
+        and m.endDate < :today
+        and m.endDate <= :endDate
+    """)
+    Long countEndingSoonMovies(
+            @Param("status") MovieStatus status,
+            @Param("today") LocalDate today,
+            @Param("endDate") LocalDate endDate
+    );
 }
