@@ -4,12 +4,12 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { adminScheduleApi } from './adminScheduleApi';
 
 const STATUS_LABEL = [
-  { value : "ALL", label : "전체" },
-  { value : "DRAFT", label : "임시 저장" },
-  { value : "OPEN", label : "오픈"},
-  { value : "CLOSED", label : "마감"},
-  { value : "CANCELED", label : "최소"},
-  { value : "DELETED", label : "삭제됨"},
+  { value: "ALL", label: "전체" },
+  { value: "DRAFT", label: "임시 저장" },
+  { value: "OPEN", label: "오픈" },
+  { value: "CLOSED", label: "마감" },
+  { value: "CANCELED", label: "취소" },
+  { value: "DELETED", label: "삭제됨" },
 ];
 
 const AdminScheduleListPage = () => {
@@ -20,49 +20,32 @@ const AdminScheduleListPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [pageData, setPageData] = useState([]);
+  const [error, setError] = useState(null);
 
-  const [q, setQ] = useState("");
+  const [keywords, setKeywords] = useState("");
+  const [currentKeywords, setCurrentKeywords] = useState("");
   const [status, setStatus] = useState("ALL");
 
   const [page, setPage] = useState(0);
-  const size = 10;
+  const [totalPage, setTotalPage] = useState(0);
 
-  const content = useMemo(() => pageData?.content ?? [], [pageData]);
-
-  const filtered = useMemo(() => {
-    const keyword = q.trim().toLowerCase();
-    return (content || [])
-      .filter((it) => {
-        if(status === "ALL") return true;
-        return String(it.status) === status;
-      })
-      .filter((it) => {
-        if(!keyword) return true;
-        const hay = [
-          it.screenName,
-          it.title,
-          it.scheduledDate,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        return hay.includes(keyword);
-      })
-  }, [content, q, status]);
-
-  const load = async (nextPage = page, nextStatus = status) => {
+  const load = async (nextPage = page) => {
     setLoading(true);
     try {
       const params = {
         page: nextPage,
-        size,
+        size: 20,
         sort: "scheduleId,desc",
         theaterId: Number(theaterId),
-        ...(nextStatus ? { status: nextStatus } : {}),
+        ...(status && status !== "ALL" ? { status } : {}),
+        ...(keywords?.trim() ? { keywords: keywords.trim() } : {})
       };
-
       const data = await adminScheduleApi.getList(params);
-      setPageData(data);
+      setPageData(data?.content ? data.centent : []);
+      setTotalPage(data?.totalPages ? data.totalPages : 0);
+    } catch (e) {
+      console.error(e);
+      setError(e.message);
     } finally {
       setLoading(false);
     }
@@ -70,8 +53,8 @@ const AdminScheduleListPage = () => {
 
   useEffect(() => {
     setPage(0);
-    load(0, status);
-  }, [theaterId]);
+    load();
+  }, [theaterId, status, keywords]);
 
   const goPrev = () => {
     const next = Math.max(0, page - 1);
@@ -80,7 +63,6 @@ const AdminScheduleListPage = () => {
   }
 
   const goNext = () => {
-    const totalPages = pageData?.totalPages ?? 0;
     const next = Math.min(totalPages - 1, page + 1);
     setPage(next);
     load(next);
@@ -118,7 +100,7 @@ const AdminScheduleListPage = () => {
         </div>
 
         <div className="admin-theater-list__actions">
-          <button onClick={() => load(page, status)} disabled={loading}>
+          <button onClick={() => load()} disabled={loading}>
             새로고침
           </button>
           <button onClick={goCreate} disabled={loading}>
@@ -142,15 +124,22 @@ const AdminScheduleListPage = () => {
 
         <div className="admin-theater-list__filter admin-theater-list__filter--grow">
           <label>검색</label>
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            setKeywords(currentKeywords.trim());
+            setCurrentKeywords("");
+          }}>
+            <input
+            value={currentKeywords}
+            onChange={(e) => setCurrentKeywords(e.target.value)}
             placeholder="영화명 / 상영관"
           />
+          </form>
+          
         </div>
 
         <div className="admin-theater-list__count">
-          총 <strong>{pageData?.totalElements ?? 0}</strong>개
+          총 <strong>{pageData?.length ?? 0}</strong>개
         </div>
       </div>
 
@@ -168,48 +157,51 @@ const AdminScheduleListPage = () => {
           </thead>
 
           <tbody>
-            {loading && (
+            {error ? (
               <tr>
-                <td colSpan={5} className="admin-theater-list__empty">
-                  로딩 중...
-                </td>
+                <td className="admin-theater-list__empty">에러 : {error}</td>
               </tr>
-            )}
-
-            {!loading && content.length === 0 && (
-              <tr>
-                <td colSpan={5} className="admin-theater-list__empty">
-                  데이터가 없습니다.
-                </td>
-              </tr>
-            )}
-
-            {!loading &&
-              filtered.map((s) => (
-                <tr
-                  key={s.scheduleId}
-                  onClick={() => goScheduleDetail(s.scheduleId)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <td>{s.screenName}</td>
-                  <td>
-                    <strong>{s.title ?? "-"}</strong>
-                    <div style={{ fontSize: 12, opacity: 0.7 }}>
-                      {s.runtimeMin ? `${s.runtimeMin}분` : ""}
-                    </div>
-                  </td>
-                  <td>{s.scheduledDate ?? "-"}</td>
-                  <td>
-                    {s.startAt ?? "-"}
-                    {s.endAt ? ` ~ ${s.endAt}` : ""}
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${s.status}`}>
-                      {STATUS_LABEL[s.status] ?? s.status}
-                    </span>
+            ) : (
+              loading ? (
+                <tr>
+                  <td colSpan={5} className="admin-theater-list__empty">
+                    로딩 중...
                   </td>
                 </tr>
-              ))}
+              ) : (
+                pageData?.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="admin-theater-list__empty">
+                      데이터가 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  pageData.map((s) => (
+                    <tr
+                      key={s.scheduleId}
+                      onClick={() => goScheduleDetail(s.scheduleId)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <td>{s.screenName}</td>
+                      <td>
+                        <strong>{s.title ?? "-"}</strong>
+                        <div style={{ fontSize: 12, opacity: 0.7 }}>
+                          {s.runtimeMin ? `${s.runtimeMin}분` : ""}
+                        </div>
+                      </td>
+                      <td>{s.scheduledDate ?? "-"}</td>
+                      <td>
+                        {s.startAt ?? "-"}
+                        {s.endAt ? ` ~ ${s.endAt}` : ""}
+                      </td>
+                      <td>
+                        <span className={`status-badge status-${s.status}`}>
+                          {STATUS_LABEL[s.status] ?? s.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )))}
           </tbody>
         </table>
       </div>
@@ -220,11 +212,11 @@ const AdminScheduleListPage = () => {
           이전
         </button>
         <div className="pager__info">
-          {pageData ? `${page + 1} / ${pageData.totalPages}` : "-"}
+          {pageData ? `${page + 1} / ${totalPage}` : "-"}
         </div>
         <button
           onClick={goNext}
-          disabled={loading || !pageData || page + 1 >= pageData.totalPages}
+          disabled={loading || page + 1 >= totalPage}
         >
           다음
         </button>

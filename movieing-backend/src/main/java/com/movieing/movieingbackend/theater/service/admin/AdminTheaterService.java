@@ -40,15 +40,43 @@ public class AdminTheaterService {
      * 스케줄 페이지에서 사용
      */
     @Transactional(readOnly = true)
-    public Page<TheaterListItemAdminResponseDto> getListByStatuses(List<TheaterStatus> statuses, Pageable pageable) {
-        return theaterRepository.findByStatusIn(statuses, pageable)
-                .map(t -> TheaterListItemAdminResponseDto.builder()
-                        .theaterId(t.getTheaterId())
-                        .theaterName(t.getTheaterName())
-                        .address(t.getAddress())
-                        .status(t.getStatus())
-                        .build()
-                );
+    public Page<TheaterListItemAdminResponseDto> getListByStatuses(List<TheaterStatus> statuses, TheaterStatus status, String keywords ,Pageable pageable) {
+        String q = (keywords == null ? null : keywords.trim().toLowerCase());
+        boolean hasKeywords = (q != null && !q.isBlank());
+
+        Long id = null;
+        if(hasKeywords && q.matches("^\\d+$")) {
+            id = Long.valueOf(q);
+        }
+
+        List<TheaterStatus> effectiveStatuses =
+                (statuses == null || statuses.isEmpty())
+                        ? List.of(TheaterStatus.ACTIVE, TheaterStatus.HIDDEN)
+                        : statuses;
+
+        Page<Theater> page;
+
+        if(status == null) {
+            if(!hasKeywords) {
+                page = theaterRepository.findByStatusIn(effectiveStatuses, pageable);
+            } else {
+                page = theaterRepository.searchByStatusIn(effectiveStatuses, q.toLowerCase(), id, pageable);
+            }
+        } else {
+            if(!hasKeywords) {
+                page = theaterRepository.findByStatus(status, pageable);
+            } else {
+                page = theaterRepository.searchByStatus(status, q.toLowerCase(), id, pageable);
+            }
+        }
+
+        return page.map(t -> TheaterListItemAdminResponseDto.builder()
+                .theaterId(t.getTheaterId())
+                .theaterName(t.getTheaterName())
+                .address(t.getAddress())
+                .status(t.getStatus())
+                .build()
+        );
     }
 
     /**

@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     Page<Schedule> findByStatusNot(ScheduleStatus status, Pageable pageable);
+
 }

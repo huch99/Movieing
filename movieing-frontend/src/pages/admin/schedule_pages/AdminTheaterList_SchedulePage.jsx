@@ -5,11 +5,8 @@ import { adminScheduleApi } from './adminScheduleApi';
 
 const STATUS_OPTIONS = [
   { value: "ALL", label: "전체" },
-  { value: "DRAFT", label: "임시 저장" },
   { value: "ACTIVE", label: "활성화" },
   { value: "HIDDEN", label: "숨김" },
-  { value: "CLOSED", label: "운영 종료" },
-  { value: "DELETED", label: "삭제됨" },
 ];
 
 const AdminTheaterList_SchedulePage = () => {
@@ -32,10 +29,11 @@ const AdminTheaterList_SchedulePage = () => {
         page: nextPage,
         size: 20,
         sort: "createdAt,desc",
-        ...(status && status !== "ALL" ? {status} : {status}),
+        ...(status && status !== "ALL" ? {status} : {}),
         ...(keywords?.trim() ? {keywords: keywords.trim()} : {})
       }
       const data = await adminScheduleApi.getTheaters(params);
+      console.log(data);
       setItems(data?.content ? data.content : []);
       setTotalPage(data.totalPages);
     } catch (e) {

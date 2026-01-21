@@ -73,4 +73,20 @@ public interface TheaterRepository extends JpaRepository<Theater, Long> {
                                @Param("keywords") String keywords,
                                @Param("id") Long id,
                                Pageable pageable);
+    @Query("""
+        select t
+        from Theater t
+        where t.status in :statuses
+            and(
+                lower(cast(t.theaterName as string))like concat('%', lower(:keywords), '%' )
+                or lower(cast(t.address as string)) like concat('%', lower(:keywords), '%' )
+                or (:id is not null and t.theaterId = :id)
+                )
+    """)
+    Page<Theater> searchByStatusIn(
+            @Param("statuses") List<TheaterStatus> statuses,
+            @Param("keywords") String keywords,
+            @Param("id") Long id,
+            Pageable pageable
+    );
 }

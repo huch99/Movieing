@@ -36,9 +36,15 @@ public class AdminScheduleController {
      * 영화관 목록 조회 (ACTIVE, HIDDEN)
      */
     @GetMapping("/theaters")
-    public Page<TheaterListItemAdminResponseDto> getTheaters(Pageable pageable) {
+    public Page<TheaterListItemAdminResponseDto> getTheaters(
+            @RequestParam(required = false) List<TheaterStatus> statuses,
+            @RequestParam(required = false) TheaterStatus status,
+            @RequestParam(required = false) String keywords,
+            Pageable pageable) {
         return adminTheaterService.getListByStatuses(
-                List.of(TheaterStatus.ACTIVE, TheaterStatus.HIDDEN),
+                statuses,
+                status,
+                keywords,
                 pageable
         );
     }
