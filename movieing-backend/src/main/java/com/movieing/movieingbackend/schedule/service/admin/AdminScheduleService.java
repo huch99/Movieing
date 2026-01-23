@@ -130,8 +130,9 @@ public class AdminScheduleService {
     /**
      * 스케줄 목록 조회 (페이징)
      */
-    public Page<ScheduleListItemAdminResponseDto> getList(Pageable pageable) {
-        return scheduleRepository.findByStatusNot(ScheduleStatus.DELETED, pageable)
+    public Page<ScheduleListItemAdminResponseDto> getList(Long theaterId ,Pageable pageable) {
+
+        return scheduleRepository.findByScreen_Theater_TheaterIdAndStatusNot(theaterId ,ScheduleStatus.DELETED, pageable)
                 .map(schedule -> ScheduleListItemAdminResponseDto.builder()
                         .scheduleId(schedule.getScheduleId())
                         .movieId(schedule.getMovie() != null ? schedule.getMovie().getMovieId() : null)

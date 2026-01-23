@@ -133,9 +133,11 @@ public class AdminScheduleController {
     /**
      * 스케줄 목록 조회 (페이징)
      */
-    @GetMapping
-    public Page<ScheduleListItemAdminResponseDto> getList(Pageable pageable) {
-        return adminScheduleService.getList(pageable);
+    @GetMapping("/{theaterId}/getList")
+    public Page<ScheduleListItemAdminResponseDto> getList(
+            @PathVariable Long theaterId,
+            Pageable pageable) {
+        return adminScheduleService.getList(theaterId, pageable);
     }
 
     /**

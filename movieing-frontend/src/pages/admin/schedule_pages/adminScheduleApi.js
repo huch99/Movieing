@@ -22,9 +22,9 @@ export const adminScheduleApi = {
     },
 
     // 스케줄 목록 (Page)
-    getList: async (params) => {
+    getList: async (theaterId, params) => {
         // params 예: { page: 0, size: 10, sort: "scheduleId,desc" }
-        const res = await api.get(BASE, { params });
+        const res = await api.get(`${BASE/theaterId}/getList`, { params });
         return res.data;
     },
 

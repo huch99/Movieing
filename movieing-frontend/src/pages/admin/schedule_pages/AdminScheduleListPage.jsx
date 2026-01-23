@@ -36,11 +36,10 @@ const AdminScheduleListPage = () => {
         page: nextPage,
         size: 20,
         sort: "scheduleId,desc",
-        theaterId: Number(theaterId),
         ...(status && status !== "ALL" ? { status } : {}),
         ...(keywords?.trim() ? { keywords: keywords.trim() } : {})
       };
-      const data = await adminScheduleApi.getList(params);
+      const data = await adminScheduleApi.getList(theaterId, params);
       setPageData(data?.content ? data.centent : []);
       setTotalPage(data?.totalPages ? data.totalPages : 0);
     } catch (e) {
